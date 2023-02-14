@@ -230,7 +230,7 @@ def _setMultipleTargets():
     logger.debug(debugMsg)
 
     if not os.path.exists(conf.logFile):
-        errMsg = "the specified list of targets does not exist"
+        errMsg = "指定的目标列表 不存在"
         raise SqlmapFilePathException(errMsg)
 
     if checkFile(conf.logFile, False):
@@ -257,7 +257,7 @@ def _setMultipleTargets():
                     seen.add(key)
 
     else:
-        errMsg = "the specified list of targets is not a file "
+        errMsg = "指定的目标列表 is not a file "
         errMsg += "nor a directory"
         raise SqlmapFilePathException(errMsg)
 
@@ -302,11 +302,11 @@ def _setRequestFromFile():
             seen = set()
 
             if not checkFile(requestFile, False):
-                errMsg = "specified HTTP request file '%s' " % requestFile
-                errMsg += "does not exist"
+                errMsg = "指定HTTP请求文件 '%s' " % requestFile
+                errMsg += "不存在"
                 raise SqlmapFilePathException(errMsg)
 
-            infoMsg = "parsing HTTP request from '%s'" % requestFile
+            infoMsg = "解析HTTP请求 '%s'" % requestFile
             logger.info(infoMsg)
 
             for target in parseRequestFile(requestFile):
@@ -318,27 +318,27 @@ def _setRequestFromFile():
                     seen.add(url)
 
             if url is None:
-                errMsg = "specified file '%s' " % requestFile
-                errMsg += "does not contain a usable HTTP request (with parameters)"
+                errMsg = "指定的文件 '%s' " % requestFile
+                errMsg += "不包含可用的HTTP请求(带参数)"
                 raise SqlmapDataException(errMsg)
 
     if conf.secondReq:
         conf.secondReq = safeExpandUser(conf.secondReq)
 
         if not checkFile(conf.secondReq, False):
-            errMsg = "specified second-order HTTP request file '%s' " % conf.secondReq
-            errMsg += "does not exist"
+            errMsg = "指定的二级HTTP请求文件 '%s' " % conf.secondReq
+            errMsg += "不存在"
             raise SqlmapFilePathException(errMsg)
 
-        infoMsg = "parsing second-order HTTP request from '%s'" % conf.secondReq
+        infoMsg = "解析二阶HTTP请求 '%s'" % conf.secondReq
         logger.info(infoMsg)
 
         try:
             target = next(parseRequestFile(conf.secondReq, False))
             kb.secondReq = target
         except StopIteration:
-            errMsg = "specified second-order HTTP request file '%s' " % conf.secondReq
-            errMsg += "does not contain a valid HTTP request"
+            errMsg = "指定的二级HTTP请求文件 '%s' " % conf.secondReq
+            errMsg += "不包含有效的HTTP请求"
             raise SqlmapDataException(errMsg)
 
 def _setCrawler():
@@ -367,8 +367,8 @@ def _doSearch():
         links = search(conf.googleDork)
 
         if not links:
-            errMsg = "unable to find results for your "
-            errMsg += "search dork expression"
+            errMsg = "无法为您找到结果 "
+            errMsg += "搜索dork表达式"
             raise SqlmapGenericException(errMsg)
 
         for link in links:
@@ -377,7 +377,7 @@ def _doSearch():
                 kb.targets.add((link, conf.method, conf.data, conf.cookie, None))
             elif re.search(URI_INJECTABLE_REGEX, link, re.I):
                 if kb.data.onlyGETs is None and conf.data is None and not conf.googleDork:
-                    message = "do you want to scan only results containing GET parameters? [Y/n] "
+                    message = "是否只扫描包含GET参数的结果? [Y/n] "
                     kb.data.onlyGETs = readInput(message, default='Y', boolean=True)
                 if not kb.data.onlyGETs or conf.googleDork:
                     kb.targets.add((link, conf.method, conf.data, conf.cookie, None))
@@ -389,7 +389,7 @@ def _doSearch():
 
         if kb.targets:
             infoMsg = "found %d results for your " % len(links)
-            infoMsg += "search dork expression"
+            infoMsg += "搜索dork表达式"
 
             if not conf.forms:
                 infoMsg += ", "
@@ -399,7 +399,7 @@ def _doSearch():
                 else:
                     infoMsg += "%d " % len(kb.targets)
 
-                infoMsg += "of them are testable targets"
+                infoMsg += "其中一些是可测试的目标"
 
             logger.info(infoMsg)
             break
@@ -407,8 +407,8 @@ def _doSearch():
         else:
             message = "found %d results " % len(links)
             message += "for your search dork expression, but none of them "
-            message += "have GET parameters to test for SQL injection. "
-            message += "Do you want to skip to the next result page? [Y/n]"
+            message += "有GET参数测试SQL注入. "
+            message += "您想跳到下一个结果页吗? [Y/n]"
 
             if not readInput(message, default='Y', boolean=True):
                 raise SqlmapSilentQuitException
@@ -459,12 +459,12 @@ def _setBulkMultipleTargets():
 
     conf.bulkFile = safeExpandUser(conf.bulkFile)
 
-    infoMsg = "parsing multiple targets list from '%s'" % conf.bulkFile
+    infoMsg = "解析多个目标列表 '%s'" % conf.bulkFile
     logger.info(infoMsg)
 
     if not checkFile(conf.bulkFile, False):
-        errMsg = "the specified bulk file "
-        errMsg += "does not exist"
+        errMsg = "指定的大容量文件 "
+        errMsg += "不存在"
         raise SqlmapFilePathException(errMsg)
 
     found = False
@@ -657,7 +657,7 @@ def _setWriteFile():
     logger.debug(debugMsg)
 
     if not os.path.exists(conf.fileWrite):
-        errMsg = "the provided local file '%s' does not exist" % conf.fileWrite
+        errMsg = "the provided local file '%s' 不存在" % conf.fileWrite
         raise SqlmapFilePathException(errMsg)
 
     if not conf.fileDest:
@@ -783,7 +783,7 @@ def _setTamperingFunctions():
                     script = os.path.join(path, script if script.endswith(".py") else "%s.py" % script)
 
                 elif not os.path.exists(script):
-                    errMsg = "tamper script '%s' does not exist" % script
+                    errMsg = "tamper script '%s' 不存在" % script
                     raise SqlmapFilePathException(errMsg)
 
                 elif not script.endswith(".py"):
@@ -881,7 +881,7 @@ def _setPreprocessFunctions():
                     continue
 
                 if not os.path.exists(script):
-                    errMsg = "preprocess script '%s' does not exist" % script
+                    errMsg = "preprocess script '%s' 不存在" % script
                     raise SqlmapFilePathException(errMsg)
 
                 elif not script.endswith(".py"):
@@ -964,7 +964,7 @@ def _setPostprocessFunctions():
                     continue
 
                 if not os.path.exists(script):
-                    errMsg = "postprocess script '%s' does not exist" % script
+                    errMsg = "postprocess script '%s' 不存在" % script
                     raise SqlmapFilePathException(errMsg)
 
                 elif not script.endswith(".py"):
@@ -2860,11 +2860,11 @@ def _basicOptionValidation():
             conf.encoding = _
 
     if conf.fileWrite and not os.path.isfile(conf.fileWrite):
-        errMsg = "file '%s' does not exist" % os.path.abspath(conf.fileWrite)
+        errMsg = "file '%s' 不存在" % os.path.abspath(conf.fileWrite)
         raise SqlmapFilePathException(errMsg)
 
     if conf.loadCookies and not os.path.exists(conf.loadCookies):
-        errMsg = "cookies file '%s' does not exist" % os.path.abspath(conf.loadCookies)
+        errMsg = "cookies file '%s' 不存在" % os.path.abspath(conf.loadCookies)
         raise SqlmapFilePathException(errMsg)
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
