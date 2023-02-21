@@ -22,10 +22,10 @@ from lib.utils.brute import tableExists
 
 def action():
     """
-    This function exploit the SQL injection on the affected
-    URL parameter and extract requested data from the
-    back-end database management system or operating system
-    if possible
+    该函数利用SQL注入对受影响的
+URL参数，并从
+后端数据库管理系统或操作系统
+如果可能的话
     """
 
     # First of all we have to identify the back-end database management
@@ -35,20 +35,20 @@ def action():
     if not Backend.getDbms() or not conf.dbmsHandler:
         htmlParsed = Format.getErrorParsedDBMSes()
 
-        errMsg = "sqlmap was not able to fingerprint the "
-        errMsg += "back-end database management system"
+        errMsg = "Sqlmap无法识别 "
+        errMsg += "后端数据库管理系统"
 
         if htmlParsed:
-            errMsg += ", but from the HTML error page it was "
-            errMsg += "possible to determinate that the "
-            errMsg += "back-end DBMS is %s" % htmlParsed
+            errMsg += ", 但从HTML错误页面来看,它是 "
+            errMsg += "可以确定的是 "
+            errMsg += "后端DBMS是 %s" % htmlParsed
 
         if htmlParsed and htmlParsed.lower() in SUPPORTED_DBMS:
-            errMsg += ". Do not specify the back-end DBMS manually, "
-            errMsg += "sqlmap will fingerprint the DBMS for you"
+            errMsg += ". 不要手动指定后端DBMS, "
+            errMsg += "sqlmap将为您识别DBMS"
         elif kb.nullConnection:
-            errMsg += ". You can try to rerun without using optimization "
-            errMsg += "switch '%s'" % ("-o" if conf.optimize else "--null-connection")
+            errMsg += ". 您可以尝试在不使用优化的情况下重新运行 "
+            errMsg += "转换 '%s'" % ("-o" if conf.optimize else "--null-connection")
 
         raise SqlmapUnsupportedDBMSException(errMsg)
 
@@ -80,7 +80,7 @@ def action():
 
     if conf.getPasswordHashes:
         try:
-            conf.dumper.userSettings("database management system users password hashes", conf.dbmsHandler.getPasswordHashes(), "password hash", CONTENT_TYPE.PASSWORDS)
+            conf.dumper.userSettings("数据库管理系统用户密码哈希", conf.dbmsHandler.getPasswordHashes(), "password hash", CONTENT_TYPE.PASSWORDS)
         except SqlmapNoneDataException as ex:
             logger.critical(ex)
         except:
@@ -88,7 +88,7 @@ def action():
 
     if conf.getPrivileges:
         try:
-            conf.dumper.userSettings("database management system users privileges", conf.dbmsHandler.getPrivileges(), "privilege", CONTENT_TYPE.PRIVILEGES)
+            conf.dumper.userSettings("数据库管理系统用户权限", conf.dbmsHandler.getPrivileges(), "privilege", CONTENT_TYPE.PRIVILEGES)
         except SqlmapNoneDataException as ex:
             logger.critical(ex)
         except:
@@ -96,7 +96,7 @@ def action():
 
     if conf.getRoles:
         try:
-            conf.dumper.userSettings("database management system users roles", conf.dbmsHandler.getRoles(), "role", CONTENT_TYPE.ROLES)
+            conf.dumper.userSettings("数据库管理系统用户角色", conf.dbmsHandler.getRoles(), "role", CONTENT_TYPE.ROLES)
         except SqlmapNoneDataException as ex:
             logger.critical(ex)
         except:
