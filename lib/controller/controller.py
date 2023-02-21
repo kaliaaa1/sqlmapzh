@@ -105,8 +105,8 @@ def _selectInjection():
         kb.injection = kb.injections[0]
 
     elif len(points) > 1:
-        message = "there were multiple injection points, please select "
-        message += "the one to use for following injections:\n"
+        message = "有多个注入点，请选择 "
+        message += "用于后续注入的:\n"
 
         points = []
 
@@ -120,7 +120,7 @@ def _selectInjection():
                 points.append(point)
                 ptype = PAYLOAD.PARAMETER[ptype] if isinstance(ptype, int) else ptype
 
-                message += "[%d] place: %s, parameter: " % (i, place)
+                message += "[%d] 位置: %s, 参数: " % (i, place)
                 message += "%s, type: %s" % (parameter, ptype)
 
                 if i == 0:
@@ -136,14 +136,14 @@ def _selectInjection():
         elif choice == 'Q':
             raise SqlmapUserQuitException
         else:
-            errMsg = "invalid choice"
+            errMsg = "无效的选择"
             raise SqlmapValueException(errMsg)
 
         kb.injection = kb.injections[index]
 
 def _formatInjection(inj):
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else inj.place
-    data = "Parameter: %s (%s)\n" % (inj.parameter, paramType)
+    data = "参数: %s (%s)\n" % (inj.parameter, paramType)
 
     for stype, sdata in inj.data.items():
         title = sdata.title
@@ -160,9 +160,9 @@ def _formatInjection(inj):
                 title = title.replace("columns", "column")
         elif comment:
             vector = "%s%s" % (vector, comment)
-        data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
-        data += "    Title: %s\n" % title
-        data += "    Payload: %s\n" % urldecode(payload, unsafe="&", spaceplus=(inj.place != PLACE.GET and kb.postSpaceToPlus))
+        data += "    类型: %s\n" % PAYLOAD.SQLINJECTION[stype]
+        data += "    标题: %s\n" % title
+        data += "    有效载荷: %s\n" % urldecode(payload, unsafe="&", spaceplus=(inj.place != PLACE.GET and kb.postSpaceToPlus))
         data += "    Vector: %s\n\n" % vector if conf.verbose > 1 else "\n"
 
     return data
@@ -172,10 +172,10 @@ def _showInjections():
         kb.wizardMode = False
 
     if kb.testQueryCount > 0:
-        header = "sqlmap identified the following injection point(s) with "
-        header += "a total of %d HTTP(s) requests" % kb.testQueryCount
+        header = "Sqlmap标识了以下注入点 "
+        header += "总共 %d HTTP(s) 请求" % kb.testQueryCount
     else:
-        header = "sqlmap resumed the following injection point(s) from stored session"
+        header = "sqlmap从存储会话恢复了以下注入点"
 
     if conf.api:
         conf.dumper.string("", {"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, content_type=CONTENT_TYPE.TARGET)
@@ -185,20 +185,20 @@ def _showInjections():
         conf.dumper.string(header, data)
 
     if conf.tamper:
-        warnMsg = "changes made by tampering scripts are not "
-        warnMsg += "included in shown payload content(s)"
+        warnMsg = "通过篡改脚本所做的更改则不是 "
+        warnMsg += "包含在显示的有效负载内容中(s)"
         logger.warning(warnMsg)
 
     if conf.hpp:
-        warnMsg = "changes made by HTTP parameter pollution are not "
-        warnMsg += "included in shown payload content(s)"
+        warnMsg = "HTTP参数污染所做的更改则不是 "
+        warnMsg += "包含在显示的有效负载内容中(s)"
         logger.warning(warnMsg)
 
 def _randomFillBlankFields(value):
     retVal = value
 
     if extractRegexResult(EMPTY_FORM_FIELDS_REGEX, value):
-        message = "do you want to fill blank fields with random values? [Y/n] "
+        message = "要用随机值填充空白字段吗? [Y/n] "
 
         if readInput(message, default='Y', boolean=True):
             for match in re.finditer(EMPTY_FORM_FIELDS_REGEX, retVal):
@@ -261,15 +261,15 @@ def _saveToResultsFile():
 
         conf.resultsFP.flush()
     except IOError as ex:
-        errMsg = "unable to write to the results file '%s' ('%s'). " % (conf.resultsFile, getSafeExString(ex))
+        errMsg = "无法写入结果文件 '%s' ('%s'). " % (conf.resultsFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
 @stackedmethod
 def start():
     """
-    This function calls a function that performs checks on both URL
-    stability and all GET, POST, Cookie and User-Agent parameters to
-    check if they are dynamic and SQL injection affected
+    这个函数调用一个对两个URL执行检查的函数
+以及所有GET, POST, Cookie和User-Agent参数
+检查它们是否受到动态和SQL注入的影响
     """
 
     if conf.hashFile:
@@ -285,13 +285,13 @@ def start():
         kb.targets.add((conf.url, conf.method, conf.data, conf.cookie, None))
 
     if conf.configFile and not kb.targets:
-        errMsg = "you did not edit the configuration file properly, set "
-        errMsg += "the target URL, list of targets or google dork"
+        errMsg = "您没有正确编辑配置文件，请设置 "
+        errMsg += "目标URL、目标列表或google dork"
         logger.error(errMsg)
         return False
 
     if kb.targets and isListLike(kb.targets) and len(kb.targets) > 1:
-        infoMsg = "found a total of %d targets" % len(kb.targets)
+        infoMsg = "共找到个 %d 目标" % len(kb.targets)
         logger.info(infoMsg)
 
     targetCount = 0
@@ -302,11 +302,11 @@ def start():
 
         try:
             if conf.checkInternet:
-                infoMsg = "checking for Internet connection"
+                infoMsg = "检查Internet连接"
                 logger.info(infoMsg)
 
                 if not checkInternet():
-                    warnMsg = "[%s] [WARNING] no connection detected" % time.strftime("%X")
+                    warnMsg = "[%s] [警告] 未检测到连接" % time.strftime("%X")
                     dataToStdout(warnMsg)
 
                     valid = False
@@ -319,7 +319,7 @@ def start():
                             time.sleep(5)
 
                     if not valid:
-                        errMsg = "please check your Internet connection and rerun"
+                        errMsg = "请检查Internet连接并重新运行"
                         raise SqlmapConnectionException(errMsg)
                     else:
                         dataToStdout("\n")
@@ -362,16 +362,16 @@ def start():
 
             if testSqlInj and conf.hostname in kb.vulnHosts:
                 if kb.skipVulnHost is None:
-                    message = "SQL injection vulnerability has already been detected "
-                    message += "against '%s'. Do you want to skip " % conf.hostname
-                    message += "further tests involving it? [Y/n]"
+                    message = "已检测到SQL注入漏洞 "
+                    message += "反对 '%s'. 你想跳过吗 " % conf.hostname
+                    message += "进一步的测试? [Y/n]"
 
                     kb.skipVulnHost = readInput(message, default='Y', boolean=True)
 
                 testSqlInj = not kb.skipVulnHost
 
             if not testSqlInj:
-                infoMsg = "skipping '%s'" % targetUrl
+                infoMsg = "跳过 '%s'" % targetUrl
                 logger.info(infoMsg)
                 continue
 
@@ -391,7 +391,7 @@ def start():
                     if conf.method == HTTPMETHOD.GET and targetUrl.find("?") == -1:
                         continue
 
-                    message += "\ndo you want to test this form? [Y/n/q] "
+                    message += "\n您想测试这个表单吗? [Y/n/q] "
                     choice = readInput(message, default='Y').upper()
 
                     if choice == 'N':
@@ -408,7 +408,7 @@ def start():
                         else:
                             if '?' in targetUrl:
                                 firstPart, secondPart = targetUrl.split('?', 1)
-                                message = "Edit GET data [default: %s]: " % secondPart
+                                message = "编辑GET数据 [default: %s]: " % secondPart
                                 test = readInput(message, default=secondPart)
                                 test = _randomFillBlankFields(test)
                                 conf.url = "%s?%s" % (firstPart, test)
@@ -417,7 +417,7 @@ def start():
 
                 else:
                     if not conf.scope:
-                        message += "\ndo you want to test this URL? [Y/n/q]"
+                        message += "\n您想测试这个URL吗 [Y/n/q]"
                         choice = readInput(message, default='Y').upper()
 
                         if choice == 'N':
@@ -428,7 +428,7 @@ def start():
                     else:
                         pass
 
-                    infoMsg = "testing URL '%s'" % targetUrl
+                    infoMsg = "测试网址 '%s'" % targetUrl
                     logger.info(infoMsg)
 
             setupTargetEnv()
@@ -515,8 +515,8 @@ def start():
                         if kb.processUserMarks:
                             if testSqlInj and place not in (PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
                                 if kb.processNonCustom is None:
-                                    message = "other non-custom parameters found. "
-                                    message += "Do you want to process them too? [Y/n/q] "
+                                    message = "找到其他非自定义参数. "
+                                    message += "你也想处理它们吗 [Y/n/q] "
                                     choice = readInput(message, default='Y').upper()
 
                                     if choice == 'Q':
@@ -525,14 +525,14 @@ def start():
                                         kb.processNonCustom = choice == 'Y'
 
                                 if not kb.processNonCustom:
-                                    infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                    infoMsg = "跳过 %s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                     logger.info(infoMsg)
                                     continue
 
                         if paramKey in kb.testedParams:
                             testSqlInj = False
 
-                            infoMsg = "skipping previously processed %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "跳过之前处理过的 %s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif any(_ in conf.testParameter for _ in (parameter, removePostHintPrefix(parameter))):
@@ -541,48 +541,48 @@ def start():
                         elif parameter in conf.rParam:
                             testSqlInj = False
 
-                            infoMsg = "skipping randomizing %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "跳过随机化 %s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif parameter in conf.skip or kb.postHint and parameter.split(' ')[-1] in conf.skip:
                             testSqlInj = False
 
-                            infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "跳过 %s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif conf.paramExclude and (re.search(conf.paramExclude, parameter, re.I) or kb.postHint and re.search(conf.paramExclude, parameter.split(' ')[-1], re.I)):
                             testSqlInj = False
 
-                            infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "跳过 %s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif conf.csrfToken and re.search(conf.csrfToken, parameter, re.I):
                             testSqlInj = False
 
-                            infoMsg = "skipping anti-CSRF token parameter '%s'" % parameter
+                            infoMsg = "跳过anti-CSRF令牌参数 '%s'" % parameter
                             logger.info(infoMsg)
 
                         # Ignore session-like parameters for --level < 4
                         elif conf.level < 4 and (parameter.upper() in IGNORE_PARAMETERS or any(_ in parameter.lower() for _ in CSRF_TOKEN_PARAMETER_INFIXES) or parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX)):
                             testSqlInj = False
 
-                            infoMsg = "ignoring %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "忽略 %s参数r '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.technique or conf.skipStatic:
                             check = checkDynParam(place, parameter, value)
 
                             if not check:
-                                warnMsg = "%sparameter '%s' does not appear to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                warnMsg = "%s参数 '%s' 似乎不是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.warning(warnMsg)
 
                                 if conf.skipStatic:
-                                    infoMsg = "skipping static %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                    infoMsg = "跳过静态 %s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                     logger.info(infoMsg)
 
                                     testSqlInj = False
                             else:
-                                infoMsg = "%sparameter '%s' appears to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                infoMsg = "%s参数 '%s' 似乎是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                         kb.testedParams.add(paramKey)
@@ -597,18 +597,18 @@ def start():
 
                                 if check != HEURISTIC_TEST.POSITIVE:
                                     if conf.smart or (kb.ignoreCasted and check == HEURISTIC_TEST.CASTED):
-                                        infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                        infoMsg = "跳过 %s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                         logger.info(infoMsg)
                                         continue
 
-                                infoMsg = "testing for SQL injection on %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                infoMsg = "测试SQL注入 %s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                                 injection = checkSqlInjection(place, parameter, value)
                                 proceed = not kb.endDetection
                                 injectable = False
 
-                                if getattr(injection, "place", None) is not None:
+                                if getattr(injection, "位置", None) is not None:
                                     if NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE in injection.notes:
                                         kb.falsePositives.append(injection)
                                     else:
@@ -618,13 +618,13 @@ def start():
 
                                         if not kb.alerted:
                                             if conf.alert:
-                                                infoMsg = "executing alerting shell command(s) ('%s')" % conf.alert
+                                                infoMsg = "执行警告shell命令(s) ('%s')" % conf.alert
                                                 logger.info(infoMsg)
                                                 try:
                                                     process = subprocess.Popen(conf.alert, shell=True)
                                                     process.wait()
                                                 except Exception as ex:
-                                                    errMsg = "error occurred while executing '%s' ('%s')" % (conf.alert, getSafeExString(ex))
+                                                    errMsg = "执行时出错 '%s' ('%s')" % (conf.alert, getSafeExString(ex))
                                                     logger.error(errMsg)
 
                                             kb.alerted = True
@@ -633,8 +633,8 @@ def start():
                                         if not proceed:
                                             break
 
-                                        msg = "%sparameter '%s' " % ("%s " % injection.place if injection.place != injection.parameter else "", injection.parameter)
-                                        msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
+                                        msg = "%s参数 '%s' " % ("%s " % injection.place if injection.place != injection.parameter else "", injection.parameter)
+                                        msg += "是脆弱的。你想继续测试其他人吗(如果有的话) [y/N] "
 
                                         if not readInput(msg, default='N', boolean=True):
                                             proceed = False
@@ -642,7 +642,7 @@ def start():
                                             kb.testedParams.add(paramKey)
 
                                 if not injectable:
-                                    warnMsg = "%sparameter '%s' does not seem to be injectable" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                    warnMsg = "%s参数 '%s' 似乎不可注入" % ("%s " % paramType if paramType != parameter else "", parameter)
                                     logger.warning(warnMsg)
 
                             finally:
@@ -651,8 +651,8 @@ def start():
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if kb.vainRun and not conf.multipleTargets:
-                    errMsg = "no parameter(s) found for testing in the provided data "
-                    errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
+                    errMsg = "在提供的数据中找不到用于测试的参数 "
+                    errMsg += "(例如,'www.site.com/index.php?id=1'中的GET参数'id')"
                     if kb.originalPage:
                         advice = []
                         if not conf.forms and re.search(r"<form", kb.originalPage) is not None:
@@ -660,56 +660,56 @@ def start():
                         if not conf.crawlDepth and re.search(r"href=[\"']/?\w", kb.originalPage) is not None:
                             advice.append("--crawl=2")
                         if advice:
-                            errMsg += ". You are advised to rerun with '%s'" % ' '.join(advice)
+                            errMsg += ". 建议您重新运行 '%s'" % ' '.join(advice)
                     raise SqlmapNoneDataException(errMsg)
                 else:
-                    errMsg = "all tested parameters do not appear to be injectable."
+                    errMsg = "所有测试参数似乎都不是可注射的."
 
                     if conf.level < 5 or conf.risk < 3:
-                        errMsg += " Try to increase values for '--level'/'--risk' options "
-                        errMsg += "if you wish to perform more tests."
+                        errMsg += " 尝试增加的值 '--level'/'--risk' 选项 "
+                        errMsg += "如果希望执行更多测试."
 
                     if isinstance(conf.technique, list) and len(conf.technique) < 5:
-                        errMsg += " Rerun without providing the option '--technique'."
+                        errMsg += " 在不提供选项的情况下重新运行 '--technique'."
 
                     if not conf.textOnly and kb.originalPage:
                         percent = (100.0 * len(getFilteredPageContent(kb.originalPage)) / len(kb.originalPage))
 
                         if kb.dynamicMarkings:
-                            errMsg += " You can give it a go with the switch '--text-only' "
-                            errMsg += "if the target page has a low percentage "
-                            errMsg += "of textual content (~%.2f%% of " % percent
-                            errMsg += "page content is text)."
+                            errMsg += " 你可以用开关试试 '--text-only' "
+                            errMsg += "如果目标页的百分比较低 "
+                            errMsg += "文本内容 (~%.2f%% of " % percent
+                            errMsg += "页面内容为文本)."
                         elif percent < LOW_TEXT_PERCENT and not kb.errorIsNone:
-                            errMsg += " Please retry with the switch '--text-only' "
-                            errMsg += "(along with --technique=BU) as this case "
-                            errMsg += "looks like a perfect candidate "
-                            errMsg += "(low textual content along with inability "
-                            errMsg += "of comparison engine to detect at least "
-                            errMsg += "one dynamic parameter)."
+                            errMsg += " 请重试交换机 '--text-only' "
+                            errMsg += "(随着 --technique=BU) 在这种情况下 "
+                            errMsg += "看起来是个完美的人选 "
+                            errMsg += "(文本内容低，且无法使用 "
+                            errMsg += "的比较引擎至少要检测到 "
+                            errMsg += "一个动态参数)."
 
                     if kb.heuristicTest == HEURISTIC_TEST.POSITIVE:
-                        errMsg += " As heuristic test turned out positive you are "
-                        errMsg += "strongly advised to continue on with the tests."
+                        errMsg += " 启发式测试结果是肯定的 "
+                        errMsg += "强烈建议继续测试."
 
                     if conf.string:
-                        errMsg += " Also, you can try to rerun by providing a "
-                        errMsg += "valid value for option '--string' as perhaps the string you "
-                        errMsg += "have chosen does not match "
-                        errMsg += "exclusively True responses."
+                        errMsg += " 此外，您可以尝试通过提供 "
+                        errMsg += "选项“--string”的有效值可能是 "
+                        errMsg += "选择的不匹配 "
+                        errMsg += "完全正确的回答."
                     elif conf.regexp:
-                        errMsg += " Also, you can try to rerun by providing a "
-                        errMsg += "valid value for option '--regexp' as perhaps the regular "
-                        errMsg += "expression that you have chosen "
-                        errMsg += "does not match exclusively True responses."
+                        errMsg += " 此外，您可以尝试通过提供 "
+                        errMsg += "选项“--regexp”的有效值可能是 "
+                        errMsg += "您选择的表达式 "
+                        errMsg += "不完全匹配True响应."
 
                     if not conf.tamper:
-                        errMsg += " If you suspect that there is some kind of protection mechanism "
-                        errMsg += "involved (e.g. WAF) maybe you could try to use "
-                        errMsg += "option '--tamper' (e.g. '--tamper=space2comment')"
+                        errMsg += " 如果你怀疑有某种保护机制 "
+                        errMsg += "涉及(例如WAF)也许您可以尝试使用 "
+                        errMsg += "选项 '--tamper' (列如 '--tamper=space2comment')"
 
                         if not conf.randomAgent:
-                            errMsg += " and/or switch '--random-agent'"
+                            errMsg += " 或者开启随机ua '--random-agent'"
 
                     raise SqlmapNotVulnerableException(errMsg.rstrip('.'))
             else:
@@ -723,7 +723,7 @@ def start():
 
             if kb.injection.place is not None and kb.injection.parameter is not None:
                 if conf.multipleTargets:
-                    message = "do you want to exploit this SQL injection? [Y/n] "
+                    message = "是否要利用此SQL注入? [Y/n] "
                     condition = readInput(message, default='Y', boolean=True)
                 else:
                     condition = True
@@ -734,15 +734,15 @@ def start():
         except KeyboardInterrupt:
             if kb.lastCtrlCTime and (time.time() - kb.lastCtrlCTime < 1):
                 kb.multipleCtrlC = True
-                raise SqlmapUserQuitException("user aborted (Ctrl+C was pressed multiple times)")
+                raise SqlmapUserQuitException("用户已中止(多次按下Ctrl+C)")
 
             kb.lastCtrlCTime = time.time()
 
             if conf.multipleTargets:
-                warnMsg = "user aborted in multiple target mode"
+                warnMsg = "用户在多目标模式下中止"
                 logger.warning(warnMsg)
 
-                message = "do you want to skip to the next target in list? [Y/n/q]"
+                message = "是否要跳到列表中的下一个目标? [Y/n/q]"
                 choice = readInput(message, default='Y').upper()
 
                 if choice == 'N':
@@ -767,7 +767,7 @@ def start():
             if conf.multipleTargets:
                 _saveToResultsFile()
 
-                errMsg += ", skipping to the next target"
+                errMsg += ", 跳到下一个目标"
                 logger.error(errMsg.lstrip(", "))
             else:
                 logger.critical(errMsg)
@@ -777,18 +777,18 @@ def start():
             showHttpErrorCodes()
 
             if kb.maxConnectionsFlag:
-                warnMsg = "it appears that the target "
-                warnMsg += "has a maximum connections "
-                warnMsg += "constraint"
+                warnMsg = "看来目标 "
+                warnMsg += "具有最大连接数 "
+                warnMsg += "约束"
                 logger.warning(warnMsg)
 
     if kb.dataOutputFlag and not conf.multipleTargets:
-        logger.info("fetched data logged to text files under '%s'" % conf.outputPath)
+        logger.info("获取的数据记录到文本文件下 '%s'" % conf.outputPath)
 
     if conf.multipleTargets:
         if conf.resultsFile:
-            infoMsg = "you can find results of scanning in multiple targets "
-            infoMsg += "mode inside the CSV file '%s'" % conf.resultsFile
+            infoMsg = "您可以在多个目标中找到扫描结果 "
+            infoMsg += "CSV文件中的模式 '%s'" % conf.resultsFile
             logger.info(infoMsg)
 
     return True
