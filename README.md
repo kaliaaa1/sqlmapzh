@@ -4,6 +4,10 @@
 
  安装sqlmapzh
 
+![](C:\Users\Administrator\Desktop\q.png)
+
+![](C:\Users\Administrator\Desktop\2.png)
+
     git clone --depth 1 https://github.com/kaliaaa1/sqlmapzh.git
 
 ```
@@ -11,7 +15,5 @@ cd sqlmapzh
 ```
 
 ```
-python slqmap。
+python slqmap.py
 ```
-
-
