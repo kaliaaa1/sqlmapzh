@@ -41,7 +41,7 @@ def decloak(inputFile=None, data=None):
         data = zlib.decompress(xor(data, KEY))
     except Exception as ex:
         print(ex)
-        print('ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile)
+        print('错误:提供的输入文件 \'%s\' 不包含有效的隐藏内容' % inputFile)
         sys.exit(1)
     finally:
         f.close()
@@ -60,13 +60,13 @@ def main():
         (args, _) = parser.parse_args()
 
         if not args.inputFile:
-            parser.error('Missing the input file, -h for help')
+            parser.error('缺少输入文件, -h for help')
 
     except (OptionError, TypeError) as ex:
         parser.error(ex)
 
     if not os.path.isfile(args.inputFile):
-        print('ERROR: the provided input file \'%s\' is non existent' % args.inputFile)
+        print('错误:提供的输入文件 \'%s\' 不存在' % args.inputFile)
         sys.exit(1)
 
     if not args.decrypt:
