@@ -15,7 +15,7 @@ try:
     try:
         __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
     except ImportError:
-        sys.exit("[!] 检测到错误安装（缺少模块）。 访问“https://github.com/sqlmapproject/sqlmap/#installation”了解更多详情")
+        sys.exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
 
     import bdb
     import glob
@@ -91,7 +91,7 @@ try:
     from lib.parse.cmdline import cmdLineParser
     from lib.utils.crawler import crawl
 except KeyboardInterrupt:
-    errMsg = "用户中止"
+    errMsg = "user aborted"
 
     if "logger" in globals():
         logger.critical(errMsg)
@@ -102,8 +102,8 @@ except KeyboardInterrupt:
 
 def modulePath():
     """
-    这将为我们提供程序的目录，即使我们被冻结
-使用py2exe
+    This will get us the program's directory, even if we are frozen
+    using py2exe
     """
 
     try:
@@ -117,16 +117,16 @@ def checkEnvironment():
     try:
         os.path.isdir(modulePath())
     except UnicodeEncodeError:
-        errMsg = "您的系统无法正确处理非 ASCII 路径。 "
-        errMsg += "请将 sqlmap 的目录移动到其他位置"
+        errMsg = "your system does not properly handle non-ASCII paths. "
+        errMsg += "Please move the sqlmap's directory to the other location"
         logger.critical(errMsg)
         raise SystemExit
 
     if LooseVersion(VERSION) < LooseVersion("1.0"):
-        errMsg = "您的运行时环境（例如 PYTHONPATH）是 "
-        errMsg += "破碎的。 请确保您没有运行 "
-        errMsg += "较新版本的 sqlmap 和较旧版本的运行时脚本 "
-        errMsg += "版本"
+        errMsg = "your runtime environment (e.g. PYTHONPATH) is "
+        errMsg += "broken. Please make sure that you are not running "
+        errMsg += "newer versions of sqlmap with runtime scripts for older "
+        errMsg += "versions"
         logger.critical(errMsg)
         raise SystemExit
 
@@ -140,7 +140,7 @@ def checkEnvironment():
 
 def main():
     """
-    从命令行运行时sqlmap的主要功能.
+    Main function of sqlmap when running from command line.
     """
 
     try:
@@ -171,8 +171,8 @@ def main():
             setRestAPILog()
 
         conf.showTime = True
-        dataToStdout("[!] 法律免责声明: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
-        dataToStdout("[*] 开始 @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)
+        dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
+        dataToStdout("[*] starting @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)
 
         init()
 
@@ -205,13 +205,13 @@ def main():
                                     if not re.search(r"(?i)\Ahttp[s]*://", target):
                                         target = "http://%s" % target
 
-                                    infoMsg = "为目标 URL 启动爬虫 '%s' (%d/%d)" % (target, i + 1, len(targets))
+                                    infoMsg = "starting crawler for target URL '%s' (%d/%d)" % (target, i + 1, len(targets))
                                     logger.info(infoMsg)
 
                                     crawl(target)
                                 except Exception as ex:
                                     if target and not isinstance(ex, SqlmapUserQuitException):
-                                        errMsg = "抓取时出现问题 '%s' ('%s')" % (target, getSafeExString(ex))
+                                        errMsg = "problem occurred while crawling '%s' ('%s')" % (target, getSafeExString(ex))
                                         logger.error(errMsg)
                                     else:
                                         raise
@@ -223,8 +223,8 @@ def main():
                     except Exception as ex:
                         os._exitcode = 1
 
-                        if "无法开始新线程" in getSafeExString(ex):
-                            errMsg = "无法启动新线程。 请检查操作系统 (u) 限制"
+                        if "can't start new thread" in getSafeExString(ex):
+                            errMsg = "unable to start new threads. Please check OS (u)limits"
                             logger.critical(errMsg)
                             raise SystemExit
                         else:
@@ -232,7 +232,7 @@ def main():
 
     except SqlmapUserQuitException:
         if not conf.batch:
-            errMsg = "用户退出"
+            errMsg = "user quit"
             logger.error(errMsg)
 
     except (SqlmapSilentQuitException, bdb.BdbQuit):
@@ -273,166 +273,171 @@ def main():
         os._exitcode = 255
 
         if any(_ in excMsg for _ in ("MemoryError", "Cannot allocate memory")):
-            errMsg = "检测到内存耗尽"
+            errMsg = "memory exhaustion detected"
             logger.critical(errMsg)
             raise SystemExit
 
         elif any(_ in excMsg for _ in ("No space left", "Disk quota exceeded", "Disk full while accessing")):
-            errMsg = "输出设备上没有剩余空间"
+            errMsg = "no space left on output device"
             logger.critical(errMsg)
             raise SystemExit
 
         elif any(_ in excMsg for _ in ("The paging file is too small",)):
-            errMsg = "页面文件没有剩余空间"
+            errMsg = "no space left for paging file"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("Access is denied", "subprocess", "metasploit")):
-            errMsg = "运行 Metasploit 时出现权限错误"
+            errMsg = "permission error occurred while running Metasploit"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("Permission denied", "metasploit")):
-            errMsg = "使用 Metasploit 时出现权限错误"
+            errMsg = "permission error occurred while using Metasploit"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "Read-only file system" in excMsg:
-            errMsg = "输出设备安装为只读"
+            errMsg = "output device is mounted as read-only"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "Insufficient system resources" in excMsg:
-            errMsg = "检测到资源耗尽"
+            errMsg = "resource exhaustion detected"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "OperationalError: disk I/O error" in excMsg:
-            errMsg = "输出设备上的 I/O 错误"
+            errMsg = "I/O error on output device"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "Violation of BIDI" in excMsg:
-            errMsg = "无效 URL（违反 Bidi IDNA 规则 - RFC 5893）"
+            errMsg = "invalid URL (violation of Bidi IDNA rule - RFC 5893)"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "Invalid IPv6 URL" in excMsg:
-            errMsg = "无效 URL ('%s')" % excMsg.strip().split('\n')[-1]
+            errMsg = "invalid URL ('%s')" % excMsg.strip().split('\n')[-1]
             logger.critical(errMsg)
             raise SystemExit
 
         elif "_mkstemp_inner" in excMsg:
-            errMsg = "访问临时文件时出现问题"
+            errMsg = "there has been a problem while accessing temporary files"
             logger.critical(errMsg)
             raise SystemExit
 
         elif any(_ in excMsg for _ in ("tempfile.mkdtemp", "tempfile.mkstemp", "tempfile.py")):
-            errMsg = "无法写入临时目录 '%s'. " % tempfile.gettempdir()
-            errMsg += "请确保您的磁盘未满并且 "
-            errMsg += "您有足够的写入权限 "
-            errMsg += "创建临时文件和/或目录"
+            errMsg = "unable to write to the temporary directory '%s'. " % tempfile.gettempdir()
+            errMsg += "Please make sure that your disk is not full and "
+            errMsg += "that you have sufficient write permissions to "
+            errMsg += "create temporary files and/or directories"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "Permission denied: '" in excMsg:
             match = re.search(r"Permission denied: '([^']*)", excMsg)
-            errMsg = "访问文件时发生权限错误 '%s'" % match.group(1)
+            errMsg = "permission error occurred while accessing file '%s'" % match.group(1)
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("twophase", "sqlalchemy")):
-            errMsg = "请更新 'sqlalchemy' 包 (>= 1.1.11) "
+            errMsg = "please update the 'sqlalchemy' package (>= 1.1.11) "
             errMsg += "(Reference: 'https://qiita.com/tkprof/items/7d7b2d00df9c5f16fffe')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "invalid maximum character passed to PyUnicode_New" in excMsg and re.search(r"\A3\.[34]", sys.version) is not None:
-            errMsg = "请升级Python版本 (>= 3.5) "
+            errMsg = "please upgrade the Python version (>= 3.5) "
             errMsg += "(Reference: 'https://bugs.python.org/issue18183')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("scramble_caching_sha2", "TypeError")):
-            errMsg = "请降级“PyMySQL”包 (=< 0.8.1) "
+            errMsg = "please downgrade the 'PyMySQL' package (=< 0.8.1) "
             errMsg += "(Reference: 'https://github.com/PyMySQL/PyMySQL/issues/700')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "must be pinned buffer, not bytearray" in excMsg:
-            errMsg = "在Python解释器中发生错误 "
-            errMsg += "在2.7中修复。请及时更新 "
+            errMsg = "error occurred at Python interpreter which "
+            errMsg += "is fixed in 2.7. Please update accordingly "
             errMsg += "(Reference: 'https://bugs.python.org/issue8104')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("OSError: [Errno 22] Invalid argument: '", "importlib")):
-            errMsg = "无法读取文件 '%s'" % extractRegexResult(r"OSError: \[Errno 22\] Invalid argument: '(?P<result>[^']+)", excMsg)
+            errMsg = "unable to read file '%s'" % extractRegexResult(r"OSError: \[Errno 22\] Invalid argument: '(?P<result>[^']+)", excMsg)
             logger.critical(errMsg)
             raise SystemExit
 
         elif "hash_randomization" in excMsg:
-            errMsg = "在Python解释器中发生错误 "
-            errMsg += "在2.7.3中修复。请及时更新 "
+            errMsg = "error occurred at Python interpreter which "
+            errMsg += "is fixed in 2.7.3. Please update accordingly "
             errMsg += "(Reference: 'https://docs.python.org/2/library/sys.html')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "AttributeError: unable to access item" in excMsg and re.search(r"3\.11\.\d+a", sys.version):
-            errMsg = "在Python 3.11的ALPHA版本中运行sqlmap时有一个已知问题 "
-            errMsg += "请降级到稳定的Python版本"
+            errMsg = "there is a known issue when sqlmap is run with ALPHA versions of Python 3.11. "
+            errMsg += "Please downgrade to some stable Python version"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("Resource temporarily unavailable", "os.fork()", "dictionaryAttack")):
-            errMsg = "在运行多处理散列破解时出现了一个问题. "
-            errMsg += "请带选项重新运行 '--threads=1'"
+            errMsg = "there has been a problem while running the multiprocessing hash cracking. "
+            errMsg += "Please rerun with option '--threads=1'"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "can't start new thread" in excMsg:
-            errMsg = "在创建新的线程实例时出现问题. "
-            errMsg += "请确保您没有运行太多的进程"
+            errMsg = "there has been a problem while creating new thread instance. "
+            errMsg += "Please make sure that you are not running too many processes"
             if not IS_WIN:
-                errMsg += " (或者增加'ulimit' -u'的值)"
+                errMsg += " (or increase the 'ulimit -u' value)"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "can't allocate read lock" in excMsg:
-            errMsg = "常规套接字操作出现问题 "
+            errMsg = "there has been a problem in regular socket operation "
             errMsg += "('%s')" % excMsg.strip().split('\n')[-1]
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("pymysql", "configparser")):
-            errMsg = "检测到'pymsql'的错误初始化(使用Python3依赖项)"
+            errMsg = "wrong initialization of 'pymsql' detected (using Python3 dependencies)"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("ntlm", "socket.error, err", "SyntaxError")):
-            errMsg = "检测到'python-ntlm'的错误初始化(使用Python2语法)"
+            errMsg = "wrong initialization of 'python-ntlm' detected (using Python2 syntax)"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("drda", "to_bytes")):
-            errMsg = "检测到'drda'的错误初始化(使用Python3语法)"
+            errMsg = "wrong initialization of 'drda' detected (using Python3 syntax)"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "'WebSocket' object has no attribute 'status'" in excMsg:
-            errMsg = "检测到错误的websocket库"
+            errMsg = "wrong websocket library detected"
             errMsg += " (Reference: 'https://github.com/sqlmapproject/sqlmap/issues/4572#issuecomment-775041086')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("window = tkinter.Tk()",)):
-            errMsg = "GUI界面的初始化有问题 "
+            errMsg = "there has been a problem in initialization of GUI interface "
             errMsg += "('%s')" % excMsg.strip().split('\n')[-1]
             logger.critical(errMsg)
             raise SystemExit
 
         elif any(_ in excMsg for _ in ("unable to access item 'liveTest'",)):
-            errMsg = "检测sqlmap不同版本文件的使用情况"
+            errMsg = "detected usage of files from different versions of sqlmap"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif any(_ in errMsg for _ in (": 9.9.9#",)):
+            errMsg = "LOL :)"
             logger.critical(errMsg)
             raise SystemExit
 
@@ -443,9 +448,9 @@ def main():
             raise SystemExit
 
         elif valid is False:
-            errMsg = "代码完整性检查失败(关闭自动问题创建). "
-            errMsg += "您应该从官方GitHub检索最新的开发版本 "
-            errMsg += "位于的存储库 '%s'" % GIT_PAGE
+            errMsg = "code integrity check failed (turning off automatic issue creation). "
+            errMsg += "You should retrieve the latest development version from official GitHub "
+            errMsg += "repository at '%s'" % GIT_PAGE
             logger.critical(errMsg)
             print()
             dataToStdout(excMsg)
@@ -457,62 +462,62 @@ def main():
             dataToStdout(excMsg)
             raise SystemExit
 
-        elif any(_ in excMsg for _ in ("ImportError", "ModuleNotFoundError", "<frozen", "Can't find file for module", "SAXReaderNotAvailable", "source code string cannot contain null bytes", "No module named", "tp_name field", "module 'sqlite3' has no attribute 'OperationalError'")):
-            errMsg = "运行时环境无效 ('%s')" % excMsg.split("Error: ")[-1].strip()
+        elif any(_ in excMsg for _ in ("ImportError", "ModuleNotFoundError", "<frozen", "Can't find file for module", "SAXReaderNotAvailable", "<built-in function compile> returned NULL without setting an exception", "source code string cannot contain null bytes", "No module named", "tp_name field", "module 'sqlite3' has no attribute 'OperationalError'")):
+            errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("SyntaxError: Non-ASCII character", ".py on line", "but no encoding declared")):
-            errMsg = "运行时环境无效 ('%s')" % excMsg.split("Error: ")[-1].strip()
+            errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("PermissionError: [WinError 5]", "multiprocessing")):
-            errMsg = "在该系统上运行多处理时存在权限问题. "
-            errMsg += "请使用重新运行 '--disable-multi'"
+            errMsg = "there is a permission problem in running multiprocessing on this system. "
+            errMsg += "Please rerun with '--disable-multi'"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("No such file", "_'")):
-            errMsg = "检测到损坏的安装 ('%s'). " % excMsg.strip().split('\n')[-1]
-            errMsg += "您应该从官方GitHub检索最新的开发版本 "
-            errMsg += "位于的存储库 '%s'" % GIT_PAGE
+            errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
+            errMsg += "You should retrieve the latest development version from official GitHub "
+            errMsg += "repository at '%s'" % GIT_PAGE
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("No such file", "sqlmap.conf", "Test")):
-            errMsg = "您正在尝试在生产环境中运行（隐藏的）开发测试"
+            errMsg = "you are trying to run (hidden) development tests inside the production environment"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("HTTPNtlmAuthHandler", "'str' object has no attribute 'decode'")):
-            errMsg = "包 'python-ntlm' 存在已知兼容问题 "
+            errMsg = "package 'python-ntlm' has a known compatibility issue with the "
             errMsg += "Python 3 (Reference: 'https://github.com/mullender/python-ntlm/pull/61')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "'DictObject' object has no attribute '" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
-            errMsg = "枚举中出现了问题. "
+            errMsg = "there has been a problem in enumeration. "
             errMsg += "Because of a considerable chance of false-positive case "
-            errMsg += "建议您使用switch重新运行 '--flush-session'"
+            errMsg += "you are advised to rerun with switch '--flush-session'"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "database disk image is malformed" in excMsg:
-            errMsg = "本地会话文件似乎格式不正确。请使用重新运行 '--flush-session'"
+            errMsg = "local session file seems to be malformed. Please rerun with '--flush-session'"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "AttributeError: 'module' object has no attribute 'F_GETFD'" in excMsg:
-            errMsg = "运行时无效 (\"%s\") " % excMsg.split("Error: ")[-1].strip()
+            errMsg = "invalid runtime (\"%s\") " % excMsg.split("Error: ")[-1].strip()
             errMsg += "(Reference: 'https://stackoverflow.com/a/38841364' & 'https://bugs.python.org/issue24944#msg249231')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "bad marshal data (unknown type code)" in excMsg:
             match = re.search(r"\s*(.+)\s+ValueError", excMsg)
-            errMsg = "您的一个.pyc文件已损坏%s" % (" ('%s')" % match.group(1) if match else "")
-            errMsg += "请删除系统上的.pyc文件以解决此问题"
+            errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
+            errMsg += ". Please delete .pyc files on your system to fix the problem"
             logger.critical(errMsg)
             raise SystemExit
 
@@ -544,7 +549,7 @@ def main():
         kb.threadContinue = False
 
         if getDaysFromLastUpdate() > LAST_UPDATE_NAGGING_DAYS:
-            warnMsg = "您的sqlmap版本已过时"
+            warnMsg = "your sqlmap version is outdated"
             logger.warning(warnMsg)
 
         if conf.get("showTime"):
