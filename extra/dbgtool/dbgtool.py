@@ -20,7 +20,7 @@ def convert(inputFile):
     fileSize = fileStat.st_size
 
     if fileSize > 65280:
-        print("错误:提供的输入文件 '%s' 太大了 debug.exe" % inputFile)
+        print("ERROR: the provided input file '%s' is too big for debug.exe" % inputFile)
         sys.exit(1)
 
     script = "n %s\nr cx\n" % os.path.basename(inputFile.replace(".", "_"))
@@ -60,7 +60,7 @@ def convert(inputFile):
 
 def main(inputFile, outputFile):
     if not os.path.isfile(inputFile):
-        print("错误:提供的输入文件 '%s' 不是一个普通文件" % inputFile)
+        print("ERROR: the provided input file '%s' is not a regular file" % inputFile)
         sys.exit(1)
 
     script = convert(inputFile)
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         (args, _) = parser.parse_args()
 
         if not args.inputFile:
-            parser.error("缺少输入文件, -h for help")
+            parser.error("Missing the input file, -h for help")
 
     except (OptionError, TypeError) as ex:
         parser.error(ex)

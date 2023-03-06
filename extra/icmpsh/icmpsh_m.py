@@ -44,7 +44,7 @@ def main(src, dst):
         from impacket import ImpactDecoder
         from impacket import ImpactPacket
     except ImportError:
-        sys.stderr.write('您需要先安装Python Impacket库\n')
+        sys.stderr.write('You need to install Python Impacket library first\n')
         sys.exit(255)
 
     # Make standard input a non-blocking file
@@ -57,7 +57,7 @@ def main(src, dst):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
     except socket.error:
-        sys.stderr.write('需要以管理员权限运行icmpsh master\n')
+        sys.stderr.write('You need to run icmpsh master with administrator privileges\n')
         sys.exit(1)
 
     sock.setblocking(0)
@@ -136,8 +136,8 @@ def main(src, dst):
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
-        msg = '缺少强制性选项。以根用户身份执行:\n'
-        msg += './icmpsh-m.py <源IP地址> <目的IP地址>\n'
+        msg = 'missing mandatory options. Execute as root:\n'
+        msg += './icmpsh-m.py <source IP address> <destination IP address>\n'
         sys.stderr.write(msg)
         sys.exit(1)
 
