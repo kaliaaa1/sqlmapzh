@@ -152,7 +152,7 @@ class Connect(object):
     def _getPageProxy(**kwargs):
         try:
             if (len(inspect.stack()) > sys.getrecursionlimit() // 2):   # Note: https://github.com/sqlmapproject/sqlmap/issues/4525
-                warnMsg = "unable to connect to the target URL"
+                warnMsg = "无法连接到目标 URL"
                 raise SqlmapConnectionException(warnMsg)
         except (TypeError, UnicodeError):
             pass
@@ -711,7 +711,7 @@ class Connect(object):
 
         except SqlmapConnectionException as ex:
             if conf.proxyList and not kb.threadException:
-                warnMsg = "unable to connect to the target URL ('%s')" % getSafeExString(ex)
+                warnMsg = "无法连接到目标 URL URL ('%s')" % getSafeExString(ex)
                 logger.critical(warnMsg)
                 threadData.retriesCount = conf.retries
                 return Connect._retryProxy(**kwargs)
@@ -800,9 +800,9 @@ class Connect(object):
                     if ignoreTimeout:
                         return None if not conf.ignoreTimeouts else "", None, None
                     else:
-                        warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, _http_client.responses[ex.code])
+                        warnMsg = "无法连接到目标 URL URL (%d - %s)" % (ex.code, _http_client.responses[ex.code])
                         if threadData.retriesCount < conf.retries and not kb.threadException:
-                            warnMsg += ". sqlmap is going to retry the request"
+                            warnMsg += ". sqlmap 将重试请求"
                             logger.critical(warnMsg)
                             return Connect._retryProxy(**kwargs)
                         elif kb.testMode:
@@ -847,7 +847,7 @@ class Connect(object):
                     kb.droppingRequests = True
                 warnMsg = "connection reset to the target URL"
             elif "URLError" in tbMsg or "error" in tbMsg:
-                warnMsg = "unable to connect to the target URL"
+                warnMsg = "无法连接到目标 URL URL"
                 match = re.search(r"Errno \d+\] ([^>\n]+)", tbMsg)
                 if match:
                     warnMsg += " ('%s')" % match.group(1).strip()
@@ -872,7 +872,7 @@ class Connect(object):
                 warnMsg = "problems with response (de)compression"
                 retrying = True
             else:
-                warnMsg = "unable to connect to the target URL"
+                warnMsg = "无法连接到目标 URL URL"
 
             if "BadStatusLine" not in tbMsg and any((conf.proxy, conf.tor)):
                 warnMsg += " or proxy"
@@ -898,7 +898,7 @@ class Connect(object):
             elif ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead", "Interrupted system call")):
                 return None if not conf.ignoreTimeouts else "", None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException:
-                warnMsg += ". sqlmap is going to retry the request"
+                warnMsg += ". sqlmap 将重试请求"
                 if not retrying:
                     warnMsg += "(s)"
                     logger.critical(warnMsg)
@@ -1189,7 +1189,7 @@ class Connect(object):
 
                 if attempt > 0:
                     warnMsg = "unable to find anti-CSRF token '%s' at '%s'" % (conf.csrfToken._original, conf.csrfUrl or conf.url)
-                    warnMsg += ". sqlmap is going to retry the request"
+                    warnMsg += ". sqlmap 将重试请求"
                     logger.warning(warnMsg)
 
                 page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.csrfData or (conf.data if conf.csrfUrl == conf.url else None), method=conf.csrfMethod or (conf.method if conf.csrfUrl == conf.url else None), cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
