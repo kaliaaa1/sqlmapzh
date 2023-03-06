@@ -90,7 +90,7 @@ class Enumeration(GenericEnumeration):
         if len(kb.data.cachedDbs) > 0:
             return kb.data.cachedDbs
 
-        infoMsg = "fetching database names"
+        infoMsg = "获取数据库名称"
         logger.info(infoMsg)
 
         rootQuery = queries[DBMS.SYBASE].dbs
