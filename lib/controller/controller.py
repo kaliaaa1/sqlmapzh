@@ -105,8 +105,8 @@ def _selectInjection():
         kb.injection = kb.injections[0]
 
     elif len(points) > 1:
-        message = "there were multiple injection points, please select "
-        message += "the one to use for following injections:\n"
+        message = "有多个注入点，请选择 "
+        message += "用于后续注入的:\n"
 
         points = []
 
@@ -136,7 +136,7 @@ def _selectInjection():
         elif choice == 'Q':
             raise SqlmapUserQuitException
         else:
-            errMsg = "invalid choice"
+            errMsg = "无效的选择"
             raise SqlmapValueException(errMsg)
 
         kb.injection = kb.injections[index]
@@ -175,7 +175,7 @@ def _showInjections():
         header = "sqlmap identified the following injection point(s) with "
         header += "a total of %d HTTP(s) requests" % kb.testQueryCount
     else:
-        header = "sqlmap resumed the following injection point(s) from stored session"
+        header = "sqlmap 从存储的会话中恢复了以下注入点"
 
     if conf.api:
         conf.dumper.string("", {"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, content_type=CONTENT_TYPE.TARGET)
@@ -582,7 +582,7 @@ def start():
 
                                     testSqlInj = False
                             else:
-                                infoMsg = "%sparameter '%s' appears to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                infoMsg = "%s参数 '%s' 似乎是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                         kb.testedParams.add(paramKey)
@@ -601,7 +601,7 @@ def start():
                                         logger.info(infoMsg)
                                         continue
 
-                                infoMsg = "testing for SQL injection on %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                infoMsg = "测试SQL注入 %s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                                 injection = checkSqlInjection(place, parameter, value)
@@ -618,13 +618,13 @@ def start():
 
                                         if not kb.alerted:
                                             if conf.alert:
-                                                infoMsg = "executing alerting shell command(s) ('%s')" % conf.alert
+                                                infoMsg = "正在执行警告shell命令 ('%s')" % conf.alert
                                                 logger.info(infoMsg)
                                                 try:
                                                     process = subprocess.Popen(conf.alert, shell=True)
                                                     process.wait()
                                                 except Exception as ex:
-                                                    errMsg = "error occurred while executing '%s' ('%s')" % (conf.alert, getSafeExString(ex))
+                                                    errMsg = "执行时出错 '%s' ('%s')" % (conf.alert, getSafeExString(ex))
                                                     logger.error(errMsg)
 
                                             kb.alerted = True
@@ -633,8 +633,8 @@ def start():
                                         if not proceed:
                                             break
 
-                                        msg = "%sparameter '%s' " % ("%s " % injection.place if injection.place != injection.parameter else "", injection.parameter)
-                                        msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
+                                        msg = "%s参数 '%s' " % ("%s " % injection.place if injection.place != injection.parameter else "", injection.parameter)
+                                        msg += "很脆弱。 你想继续测试其他人吗（如果有的话）? [y/N] "
 
                                         if not readInput(msg, default='N', boolean=True):
                                             proceed = False
@@ -642,7 +642,7 @@ def start():
                                             kb.testedParams.add(paramKey)
 
                                 if not injectable:
-                                    warnMsg = "%sparameter '%s' does not seem to be injectable" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                    warnMsg = "%s参数 '%s' 好像不能注入" % ("%s " % paramType if paramType != parameter else "", parameter)
                                     logger.warning(warnMsg)
 
                             finally:
@@ -651,8 +651,8 @@ def start():
 
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if kb.vainRun and not conf.multipleTargets:
-                    errMsg = "no parameter(s) found for testing in the provided data "
-                    errMsg += "(e.g. GET parameter 'id' in 'www.site.com/index.php?id=1')"
+                    errMsg = "在提供的数据中找不到用于测试的参数 "
+                    errMsg += "(例如GET参数 'id' in 'www.site.com/index.php?id=1')"
                     if kb.originalPage:
                         advice = []
                         if not conf.forms and re.search(r"<form", kb.originalPage) is not None:
@@ -660,17 +660,17 @@ def start():
                         if not conf.crawlDepth and re.search(r"href=[\"']/?\w", kb.originalPage) is not None:
                             advice.append("--crawl=2")
                         if advice:
-                            errMsg += ". You are advised to rerun with '%s'" % ' '.join(advice)
+                            errMsg += ". 建议您重新运行 '%s'" % ' '.join(advice)
                     raise SqlmapNoneDataException(errMsg)
                 else:
-                    errMsg = "all tested parameters do not appear to be injectable."
+                    errMsg = "所有测试参数似乎都不是可注入的."
 
                     if conf.level < 5 or conf.risk < 3:
-                        errMsg += " Try to increase values for '--level'/'--risk' options "
-                        errMsg += "if you wish to perform more tests."
+                        errMsg += " 尝试增加'--level'或者'--risk'选项的值 "
+                        errMsg += "如果希望执行更多测试."
 
                     if isinstance(conf.technique, list) and len(conf.technique) < 5:
-                        errMsg += " Rerun without providing the option '--technique'."
+                        errMsg += " 在不提供选项的情况下重新运行 '--technique'."
 
                     if not conf.textOnly and kb.originalPage:
                         percent = (100.0 * len(getFilteredPageContent(kb.originalPage)) / len(kb.originalPage))
@@ -767,7 +767,7 @@ def start():
             if conf.multipleTargets:
                 _saveToResultsFile()
 
-                errMsg += ", skipping to the next target"
+                errMsg += ", 跳到下一个目标"
                 logger.error(errMsg.lstrip(", "))
             else:
                 logger.critical(errMsg)
@@ -777,18 +777,18 @@ def start():
             showHttpErrorCodes()
 
             if kb.maxConnectionsFlag:
-                warnMsg = "it appears that the target "
-                warnMsg += "has a maximum connections "
-                warnMsg += "constraint"
+                warnMsg = "看来目标 "
+                warnMsg += "有最大连接数 "
+                warnMsg += "约束"
                 logger.warning(warnMsg)
 
     if kb.dataOutputFlag and not conf.multipleTargets:
-        logger.info("fetched data logged to text files under '%s'" % conf.outputPath)
+        logger.info("获取的数据记录到文本文件中 '%s'" % conf.outputPath)
 
     if conf.multipleTargets:
         if conf.resultsFile:
-            infoMsg = "you can find results of scanning in multiple targets "
-            infoMsg += "mode inside the CSV file '%s'" % conf.resultsFile
+            infoMsg = "您可以在多个目标中找到扫描结果 "
+            infoMsg += "CSV 文件中的模式 '%s'" % conf.resultsFile
             logger.info(infoMsg)
 
     return True
