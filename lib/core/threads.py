@@ -33,7 +33,7 @@ shared = AttribDict()
 
 class _ThreadData(threading.local):
     """
-    表示线程无关数据
+    Represents thread independent data
     """
 
     def __init__(self):
@@ -41,7 +41,7 @@ class _ThreadData(threading.local):
 
     def reset(self):
         """
-        重置线程数据模型
+        Resets thread data model
         """
 
         self.disableStdOut = False
@@ -81,14 +81,14 @@ def isDigit(value):
 
 def getCurrentThreadData():
     """
-    返回当前线程的本地数据
+    Returns current thread's local data
     """
 
     return ThreadData
 
 def getCurrentThreadName():
     """
-    返回当前线程名称
+    Returns current's thread name
     """
 
     return threading.current_thread().getName()
@@ -136,7 +136,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     try:
         if threadChoice and conf.threads == numThreads == 1 and not (kb.injection.data and not any(_ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in kb.injection.data)):
             while True:
-                message = "请输入线程数? [Enter for %d (current)] " % numThreads
+                message = "please enter number of threads? [Enter for %d (current)] " % numThreads
                 choice = readInput(message, default=str(numThreads))
                 if choice:
                     skipThreadCheck = False
@@ -147,19 +147,19 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
                     if isDigit(choice):
                         if int(choice) > MAX_NUMBER_OF_THREADS and not skipThreadCheck:
-                            errMsg = "最大使用线程数为 %d 避免潜在的连接问题" % MAX_NUMBER_OF_THREADS
+                            errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
                             logger.critical(errMsg)
                         else:
                             conf.threads = numThreads = int(choice)
                             break
 
             if numThreads == 1:
-                warnMsg = "以单线程模式运行。这可能需要一段时间"
+                warnMsg = "running in a single-thread mode. This could take a while"
                 logger.warning(warnMsg)
 
         if numThreads > 1:
             if startThreadMsg:
-                infoMsg = "启动 %d 线程" % numThreads
+                infoMsg = "starting %d threads" % numThreads
                 logger.info(infoMsg)
         else:
             try:
@@ -180,7 +180,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             try:
                 thread.start()
             except Exception as ex:
-                errMsg = "启动新线程时发生错误 ('%s')" % ex
+                errMsg = "error occurred while starting new thread ('%s')" % ex
                 logger.critical(errMsg)
                 break
 
@@ -203,19 +203,19 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
         if kb.lastCtrlCTime and (time.time() - kb.lastCtrlCTime < 1):
             kb.multipleCtrlC = True
-            raise SqlmapUserQuitException("用户已中止(多次按下Ctrl+C)")
+            raise SqlmapUserQuitException("user aborted (Ctrl+C was pressed multiple times)")
 
         kb.lastCtrlCTime = time.time()
 
         if numThreads > 1:
-            logger.info("等待线程完成%s" % (" (Ctrl+C 已按下)" if isinstance(ex, KeyboardInterrupt) else ""))
+            logger.info("waiting for threads to finish%s" % (" (Ctrl+C was pressed)" if isinstance(ex, KeyboardInterrupt) else ""))
         try:
             while (threading.active_count() > 1):
                 pass
 
         except KeyboardInterrupt:
             kb.multipleCtrlC = True
-            raise SqlmapThreadException("用户已中止(多次按下Ctrl+C)")
+            raise SqlmapThreadException("user aborted (Ctrl+C was pressed multiple times)")
 
         if forwardException:
             raise
@@ -223,9 +223,9 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     except (SqlmapConnectionException, SqlmapValueException) as ex:
         print()
         kb.threadException = True
-        logger.error("线程 %s: '%s'" % (threading.currentThread().getName(), ex))
+        logger.error("thread %s: '%s'" % (threading.currentThread().getName(), ex))
 
-        if conf.get("详细的") > 1 and isinstance(ex, SqlmapValueException):
+        if conf.get("verbose") > 1 and isinstance(ex, SqlmapValueException):
             traceback.print_exc()
 
     except Exception as ex:
@@ -239,7 +239,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
                 kb.threadException = True
                 errMsg = unhandledExceptionMessage()
-                logger.error("线程 %s: %s" % (threading.currentThread().getName(), errMsg))
+                logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
                 traceback.print_exc()
 
     finally:

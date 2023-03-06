@@ -178,8 +178,8 @@ def setHandler():
                         if not isinstance(ex, NameError):
                             raise
                         else:
-                            msg = "支持直接连接到 '%s' 不可用. " % dbms
-                            msg += "请使用重新运行 '--dependencies'"
+                            msg = "support for direct connection to '%s' is not available. " % dbms
+                            msg += "Please rerun with '--dependencies'"
                             raise SqlmapConnectionException(msg)
 
         if conf.forceDbms == dbms or handler.checkDbms():
