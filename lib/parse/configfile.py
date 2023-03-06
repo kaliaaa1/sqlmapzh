@@ -23,8 +23,8 @@ config = None
 
 def configFileProxy(section, option, datatype):
     """
-    解析配置文件并将设置保存到配置中
-     高级词典.
+    Parse configuration file and save settings into the configuration
+    advanced dictionary.
     """
 
     if config.has_option(section, option):
@@ -38,8 +38,8 @@ def configFileProxy(section, option, datatype):
             else:
                 value = config.get(section, option)
         except ValueError as ex:
-            errMsg = "处理选项时出错 "
-            errMsg += "'%s' 在提供的配置文件中 ('%s')" % (option, getUnicode(ex))
+            errMsg = "error occurred while processing the option "
+            errMsg += "'%s' in provided configuration file ('%s')" % (option, getUnicode(ex))
             raise SqlmapSyntaxException(errMsg)
 
         if value:
@@ -47,9 +47,9 @@ def configFileProxy(section, option, datatype):
         else:
             conf[option] = None
     else:
-        debugMsg = "缺少请求的选项 '%s' (section " % option
-        debugMsg += "'%s') 进入配置文件, " % section
-        debugMsg += "忽略。 跳到下一个."
+        debugMsg = "missing requested option '%s' (section " % option
+        debugMsg += "'%s') into the configuration file, " % section
+        debugMsg += "ignoring. Skipping to next."
         logger.debug(debugMsg)
 
 def configFileParser(configFile):
@@ -60,7 +60,7 @@ def configFileParser(configFile):
 
     global config
 
-    debugMsg = "解析配置文件"
+    debugMsg = "parsing configuration file"
     logger.debug(debugMsg)
 
     checkFile(configFile)
@@ -70,11 +70,11 @@ def configFileParser(configFile):
         config = UnicodeRawConfigParser()
         config.readfp(configFP)
     except Exception as ex:
-        errMsg = "您提供了无效和/或不可读的配置文件 ('%s')" % getSafeExString(ex)
+        errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % getSafeExString(ex)
         raise SqlmapSyntaxException(errMsg)
 
     if not config.has_section("Target"):
-        errMsg = "配置文件中缺少强制性部分“目标”"
+        errMsg = "missing a mandatory section 'Target' in the configuration file"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
     mandatory = False
@@ -85,7 +85,7 @@ def configFileParser(configFile):
             break
 
     if not mandatory:
-        errMsg = "配置文件中缺少强制选项 "
+        errMsg = "missing a mandatory option in the configuration file "
         errMsg += "(direct, url, logFile, bulkFile, googleDork, requestFile or wizard)"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
