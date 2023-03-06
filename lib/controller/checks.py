@@ -155,8 +155,8 @@ def checkSqlInjection(place, parameter, value):
                 # DBMS
 
                 if kb.reduceTests is None and not conf.testFilter and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
-                    msg = "it looks like the back-end DBMS is '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
-                    msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
+                    msg = "看起来后端是 DBMS '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
+                    msg += "是否要跳过特定于其他 DBMS 的测试负载? [Y/n]"
                     kb.reduceTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
 
             # If the DBMS has been fingerprinted (via DBMS-specific error
@@ -164,8 +164,8 @@ def checkSqlInjection(place, parameter, value):
             # payload), ask the user to extend the tests to all DBMS-specific,
             # regardless of --level and --risk values provided
             if kb.extendTests is None and not conf.testFilter and (conf.level < 5 or conf.risk < 3) and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
-                msg = "for the remaining tests, do you want to include all tests "
-                msg += "for '%s' extending provided " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
+                msg = "对于剩余的测试，是否要包括所有测试 "
+                msg += "对于'%s'扩展提供 " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
                 msg += "level (%d)" % conf.level if conf.level < 5 else ""
                 msg += " and " if conf.level < 5 and conf.risk < 3 else ""
                 msg += "risk (%d)" % conf.risk if conf.risk < 3 else ""
@@ -1076,7 +1076,7 @@ def heuristicCheckSqlInjection(place, parameter):
     kb.heuristicTest = HEURISTIC_TEST.CASTED if casting else HEURISTIC_TEST.NEGATIVE if not result else HEURISTIC_TEST.POSITIVE
 
     if kb.heavilyDynamic:
-        debugMsg = "heuristic check stopped because of heavy dynamicity"
+        debugMsg = "由于动态性强，启发式检查已停止"
         logger.debug(debugMsg)
         return kb.heuristicTest
 
@@ -1146,9 +1146,9 @@ def heuristicCheckSqlInjection(place, parameter):
 
 def checkDynParam(place, parameter, value):
     """
-    This function checks if the URL parameter is dynamic. If it is
-    dynamic, the content of the page differs, otherwise the
-    dynamicity might depend on another parameter.
+    此函数检查URL参数是否是动态的。如果是的话
+动态，页面的内容不同，否则
+动态性可能取决于另一个参数
     """
 
     if kb.choices.redirect:
@@ -1160,7 +1160,7 @@ def checkDynParam(place, parameter, value):
 
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
 
-    infoMsg = "testing if %sparameter '%s' is dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
+    infoMsg = "测试 %sparameter '%s' 是否是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
     logger.info(infoMsg)
 
     try:
@@ -1176,7 +1176,7 @@ def checkDynParam(place, parameter, value):
 
 def checkDynamicContent(firstPage, secondPage):
     """
-    This function checks for the dynamic content in the provided pages
+    此函数检查所提供页面中的动态内容
     """
 
     if kb.nullConnection:
@@ -1241,7 +1241,7 @@ def checkStability():
     like for instance string matching (--string).
     """
 
-    infoMsg = "testing if the target URL content is stable"
+    infoMsg = "测试目标URL内容是否稳定"
     logger.info(infoMsg)
 
     firstPage = kb.originalPage  # set inside checkConnection()
@@ -1259,11 +1259,11 @@ def checkStability():
 
     if kb.pageStable:
         if firstPage:
-            infoMsg = "target URL content is stable"
+            infoMsg = "目标URL内容稳定"
             logger.info(infoMsg)
         else:
-            errMsg = "there was an error checking the stability of page "
-            errMsg += "because of lack of content. Please check the "
+            errMsg = "检查页面稳定性时出错 "
+            errMsg += "因为缺乏内容。请检查 "
             errMsg += "page request results (and probable errors) by "
             errMsg += "using higher verbosity levels"
             logger.error(errMsg)
@@ -1338,16 +1338,16 @@ def checkWaf():
     _ = hashDBRetrieve(HASHDB_KEYS.CHECK_WAF_RESULT, True)
     if _ is not None:
         if _:
-            warnMsg = "previous heuristics detected that the target "
-            warnMsg += "is protected by some kind of WAF/IPS"
+            warnMsg = "先前的试探检测到目标 "
+            warnMsg += "受某种WAF/IPS保护"
             logger.critical(warnMsg)
         return _
 
     if not kb.originalPage:
         return None
 
-    infoMsg = "checking if the target is protected by "
-    infoMsg += "some kind of WAF/IPS"
+    infoMsg = "检查目标是否受 "
+    infoMsg += "某种WAF/IPS保护"
     logger.info(infoMsg)
 
     retVal = False
@@ -1481,7 +1481,7 @@ def checkConnection(suppressOutput=False):
                 raise SqlmapDataException(errMsg)
 
     if not suppressOutput and not conf.dummy and not conf.offline:
-        infoMsg = "testing connection to the target URL"
+        infoMsg = "测试与目标URL的连接"
         logger.info(infoMsg)
 
     try:
@@ -1491,19 +1491,19 @@ def checkConnection(suppressOutput=False):
         rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
         if conf.string:
-            infoMsg = "testing if the provided string is within the "
-            infoMsg += "target URL page content"
+            infoMsg = "测试提供的字符串是否在 "
+            infoMsg += "目标URL页面内容"
             logger.info(infoMsg)
 
             if conf.string not in rawResponse:
-                warnMsg = "you provided '%s' as the string to " % conf.string
-                warnMsg += "match, but such a string is not within the target "
-                warnMsg += "URL raw response, sqlmap will carry on anyway"
+                warnMsg = "您将'%s'作为字符串提供给 " % conf.string
+                warnMsg += "匹配，但这样的字符串不在目标内 "
+                warnMsg += "URL原始响应，sqlmap仍将继续"
                 logger.warning(warnMsg)
 
         if conf.regexp:
-            infoMsg = "testing if the provided regular expression matches within "
-            infoMsg += "the target URL page content"
+            infoMsg = "测试提供的正则表达式是否与 "
+            infoMsg += "目标URL页面内容"
             logger.info(infoMsg)
 
             if not re.search(conf.regexp, rawResponse, re.I | re.M):
