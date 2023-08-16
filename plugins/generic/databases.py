@@ -125,7 +125,7 @@ class Databases(object):
             infoMsg = "fetching database (user) names"
 
         else:
-            infoMsg = "获取数据库名称"
+            infoMsg = "fetching database names"
 
         if infoMsg:
             logger.info(infoMsg)
