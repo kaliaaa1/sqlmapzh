@@ -156,7 +156,8 @@ def _setRequestParams():
                 if not (kb.processUserMarks and kb.customInjectionMark in conf.data):
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
-                    conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*".+?)"(?<!\\")', functools.partial(process, repl=r'\g<1>%s"' % kb.customInjectionMark), conf.data)
+                    conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*".*?)"(?<!\\")', functools.partial(process, repl=r'\g<1>%s"' % kb.customInjectionMark), conf.data)
+                    conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*")"', functools.partial(process, repl=r'\g<1>%s"' % kb.customInjectionMark), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)(-?\d[\d\.]*)\b', functools.partial(process, repl=r'\g<1>\g<3>%s' % kb.customInjectionMark), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)((true|false|null))\b', functools.partial(process, repl=r'\g<1>\g<3>%s' % kb.customInjectionMark), conf.data)
                     for match in re.finditer(r'(?P<name>[^"]+)"\s*:\s*\[([^\]]+)\]', conf.data):
@@ -529,7 +530,7 @@ def _resumeDBMS():
                 Backend.setDbms(dbms)
                 Backend.setVersionList(dbmsVersion)
     else:
-        infoMsg = "恢复后端 DBMS DBMS '%s' " % dbms
+        infoMsg = "resuming back-end DBMS '%s' " % dbms
         logger.info(infoMsg)
 
         Backend.setDbms(dbms)
@@ -548,7 +549,7 @@ def _resumeOS():
     os = value
 
     if os and os != 'None':
-        infoMsg = "恢复后端 DBMS 操作系统 '%s' " % os
+        infoMsg = "resuming back-end DBMS operating system '%s' " % os
         logger.info(infoMsg)
 
         if conf.os and conf.os.lower() != os.lower():
@@ -636,7 +637,7 @@ def _createDumpDir():
     if not os.path.isdir(conf.dumpPath):
         try:
             os.makedirs(conf.dumpPath)
-        except OSError as ex:
+        except Exception as ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapdump")
             warnMsg = "unable to create dump directory "
             warnMsg += "'%s' (%s). " % (conf.dumpPath, getUnicode(ex))

@@ -152,7 +152,7 @@ class Connect(object):
     def _getPageProxy(**kwargs):
         try:
             if (len(inspect.stack()) > sys.getrecursionlimit() // 2):   # Note: https://github.com/sqlmapproject/sqlmap/issues/4525
-                warnMsg = "无法连接到目标 URL"
+                warnMsg = "unable to connect to the target URL"
                 raise SqlmapConnectionException(warnMsg)
         except (TypeError, UnicodeError):
             pass
@@ -441,7 +441,7 @@ class Connect(object):
             requestMsg += " %s" % _http_client.HTTPConnection._http_vsn_str
 
             # Prepare HTTP headers
-            headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: host}, base=None if target else {})
+            headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: getHeader(dict(conf.httpHeaders), HTTP_HEADER.HOST) or getHostHeader(url)}, base=None if target else {})
 
             if HTTP_HEADER.COOKIE in headers:
                 cookie = headers[HTTP_HEADER.COOKIE]
@@ -453,9 +453,6 @@ class Connect(object):
                 headers[HTTP_HEADER.PROXY_AUTHORIZATION] = kb.proxyAuthHeader
 
             if not conf.requestFile or not target:
-                if not getHeader(headers, HTTP_HEADER.HOST):
-                    headers[HTTP_HEADER.HOST] = getHostHeader(url)
-
                 if not getHeader(headers, HTTP_HEADER.ACCEPT):
                     headers[HTTP_HEADER.ACCEPT] = HTTP_ACCEPT_HEADER_VALUE
 
@@ -544,7 +541,7 @@ class Connect(object):
                 responseHeaders = _(ws.getheaders())
                 responseHeaders.headers = ["%s: %s\r\n" % (_[0].capitalize(), _[1]) for _ in responseHeaders.items()]
 
-                requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if hasattr(key, "capitalize") else key), getUnicode(value)) for (key, value) in responseHeaders.items()])
+                requestHeaders += "\r\n".join(["%s: %s" % (u"-".join(_.capitalize() for _ in getUnicode(key).split(u'-')) if hasattr(key, "capitalize") else getUnicode(key), getUnicode(value)) for (key, value) in responseHeaders.items()])
                 requestMsg += "\r\n%s" % requestHeaders
 
                 if post is not None:
@@ -583,7 +580,7 @@ class Connect(object):
                     else:
                         post, headers = req.data, req.headers
 
-                requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if hasattr(key, "capitalize") else key), getUnicode(value)) for (key, value) in req.header_items()])
+                requestHeaders += "\r\n".join(["%s: %s" % (u"-".join(_.capitalize() for _ in getUnicode(key).split(u'-')) if hasattr(key, "capitalize") else getUnicode(key), getUnicode(value)) for (key, value) in req.header_items()])
 
                 if not getRequestHeader(req, HTTP_HEADER.COOKIE) and conf.cj:
                     conf.cj._policy._now = conf.cj._now = int(time.time())
@@ -711,7 +708,7 @@ class Connect(object):
 
         except SqlmapConnectionException as ex:
             if conf.proxyList and not kb.threadException:
-                warnMsg = "无法连接到目标 URL URL ('%s')" % getSafeExString(ex)
+                warnMsg = "unable to connect to the target URL ('%s')" % getSafeExString(ex)
                 logger.critical(warnMsg)
                 threadData.retriesCount = conf.retries
                 return Connect._retryProxy(**kwargs)
@@ -800,9 +797,9 @@ class Connect(object):
                     if ignoreTimeout:
                         return None if not conf.ignoreTimeouts else "", None, None
                     else:
-                        warnMsg = "无法连接到目标 URL URL (%d - %s)" % (ex.code, _http_client.responses[ex.code])
+                        warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, _http_client.responses[ex.code])
                         if threadData.retriesCount < conf.retries and not kb.threadException:
-                            warnMsg += ". sqlmap 将重试请求"
+                            warnMsg += ". sqlmap is going to retry the request"
                             logger.critical(warnMsg)
                             return Connect._retryProxy(**kwargs)
                         elif kb.testMode:
@@ -814,7 +811,7 @@ class Connect(object):
                     debugMsg = "got HTTP error code: %d ('%s')" % (code, status)
                     logger.debug(debugMsg)
 
-        except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError, AttributeError, OSError):
+        except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError, AttributeError, OSError, AssertionError, KeyError):
             tbMsg = traceback.format_exc()
 
             if conf.debug:
@@ -822,6 +819,11 @@ class Connect(object):
 
             if checking:
                 return None, None, None
+            elif "KeyError:" in tbMsg:
+                if "content-length" in tbMsg:
+                    return None, None, None
+                else:
+                    raise
             elif "AttributeError:" in tbMsg:
                 if "WSAECONNREFUSED" in tbMsg:
                     return None, None, None
@@ -847,7 +849,7 @@ class Connect(object):
                     kb.droppingRequests = True
                 warnMsg = "connection reset to the target URL"
             elif "URLError" in tbMsg or "error" in tbMsg:
-                warnMsg = "无法连接到目标 URL URL"
+                warnMsg = "unable to connect to the target URL"
                 match = re.search(r"Errno \d+\] ([^>\n]+)", tbMsg)
                 if match:
                     warnMsg += " ('%s')" % match.group(1).strip()
@@ -872,7 +874,7 @@ class Connect(object):
                 warnMsg = "problems with response (de)compression"
                 retrying = True
             else:
-                warnMsg = "无法连接到目标 URL URL"
+                warnMsg = "unable to connect to the target URL"
 
             if "BadStatusLine" not in tbMsg and any((conf.proxy, conf.tor)):
                 warnMsg += " or proxy"
@@ -898,7 +900,7 @@ class Connect(object):
             elif ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead", "Interrupted system call")):
                 return None if not conf.ignoreTimeouts else "", None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException:
-                warnMsg += ". sqlmap 将重试请求"
+                warnMsg += ". sqlmap is going to retry the request"
                 if not retrying:
                     warnMsg += "(s)"
                     logger.critical(warnMsg)
@@ -1189,7 +1191,7 @@ class Connect(object):
 
                 if attempt > 0:
                     warnMsg = "unable to find anti-CSRF token '%s' at '%s'" % (conf.csrfToken._original, conf.csrfUrl or conf.url)
-                    warnMsg += ". sqlmap 将重试请求"
+                    warnMsg += ". sqlmap is going to retry the request"
                     logger.warning(warnMsg)
 
                 page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.csrfData or (conf.data if conf.csrfUrl == conf.url else None), method=conf.csrfMethod or (conf.method if conf.csrfUrl == conf.url else None), cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
@@ -1333,7 +1335,7 @@ class Connect(object):
                     compile(getBytes(re.sub(r"\s*;\s*", "\n", conf.evalCode)), "", "exec")
                 except SyntaxError as ex:
                     if ex.text:
-                        original = replacement = ex.text.strip()
+                        original = replacement = getUnicode(ex.text.strip())
 
                         if '=' in original:
                             name, value = original.split('=', 1)

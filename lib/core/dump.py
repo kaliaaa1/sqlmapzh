@@ -232,7 +232,7 @@ class Dump(object):
             self.singleString("")
 
     def dbs(self, dbs):
-        self.lister("可用数据库", dbs, content_type=CONTENT_TYPE.DBS)
+        self.lister("available databases", dbs, content_type=CONTENT_TYPE.DBS)
 
     def dbTables(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:

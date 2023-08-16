@@ -20,7 +20,7 @@ from thirdparty import six
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.7.2.22"
+VERSION = "kali代言人最新汉化版1.7.8.5"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -431,7 +431,7 @@ META_REFRESH_REGEX = r'(?i)<meta http-equiv="?refresh"?[^>]+content="?[^">]+;\s*
 JAVASCRIPT_HREF_REGEX = r'<script>\s*(\w+\.)?location\.href\s*=["\'](?P<result>[^"\']+)'
 
 # Regular expression used for parsing empty fields in tested form data
-EMPTY_FORM_FIELDS_REGEX = r'(&|\A)(?P<result>[^=]+=(&|\Z))'
+EMPTY_FORM_FIELDS_REGEX = r'(&|\A)(?P<result>[^=]+=)(?=&|\Z)'
 
 # Reference: http://www.cs.ru.nl/bachelorscripties/2010/Martin_Devillers___0437999___Analyzing_password_strength.pdf
 COMMON_PASSWORD_SUFFIXES = ("1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15", "69", "16", "6", "18")
@@ -590,7 +590,7 @@ IGNORE_SPACE_AFFECTED_KEYWORDS = ("CAST", "COUNT", "EXTRACT", "GROUP_CONCAT", "M
 # Keywords expected to be in UPPERCASE in getValue()
 GET_VALUE_UPPERCASE_KEYWORDS = ("SELECT", "FROM", "WHERE", "DISTINCT", "COUNT")
 
-LEGAL_DISCLAIMER = "未经双方事先同意，使用sqlmap攻击目标是非法的。最终用户有责任遵守所有适用的地方、州和联邦法律。开发人员不承担任何责任，也不对本程序造成的任何误用或损坏负责"
+LEGAL_DISCLAIMER = "Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program"
 
 # After this number of misses reflective removal mechanism is turned off (for speed up reasons)
 REFLECTIVE_MISS_THRESHOLD = 20
@@ -702,7 +702,7 @@ DEFAULT_COOKIE_DELIMITER = ';'
 FORCE_COOKIE_EXPIRATION_TIME = "9999999999"
 
 # Github OAuth token used for creating an automatic Issue for unhandled exceptions
-GITHUB_REPORT_OAUTH_TOKEN = "Z2hwXzJEdUdKQXVyNms3c2J2em0weXNFYlVrZ2hxczE1eDBRQnA2Vg"
+GITHUB_REPORT_OAUTH_TOKEN = "Z2hwX09GTWlsWUJVZWhiYWluS3I3T2hUbE9abHJ4cXNUTTFYeUxxTw"
 
 # Skip unforced HashDB flush requests below the threshold number of cached items
 HASHDB_FLUSH_THRESHOLD = 32

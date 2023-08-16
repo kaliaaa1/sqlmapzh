@@ -1769,7 +1769,7 @@ def parseTargetUrl():
         errMsg = "invalid target URL port (%d)" % conf.port
         raise SqlmapSyntaxException(errMsg)
 
-    conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
+    conf.url = getUnicode("%s://%s%s%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, (":%d" % conf.port) if not (conf.port == 80 and conf.scheme == "http" or conf.port == 443 and conf.scheme == "https") else "", conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
     if urlSplit.query:
@@ -3861,6 +3861,10 @@ def checkIntegrity():
                     logger.error("wrong modification time of '%s'" % filepath)
                     retVal = False
 
+    suffix = extractRegexResult(r"#(?P<result>\w+)", VERSION_STRING)
+    if suffix and suffix not in {"dev", "stable"}:
+        retVal = False
+
     return retVal
 
 def getDaysFromLastUpdate():
@@ -4940,6 +4944,12 @@ def decodeDbmsHexValue(value, raw=False):
 
     >>> decodeDbmsHexValue('3132332031') == u'123 1'
     True
+    >>> decodeDbmsHexValue('31003200330020003100') == u'123 1'
+    True
+    >>> decodeDbmsHexValue('00310032003300200031') == u'123 1'
+    True
+    >>> decodeDbmsHexValue('0x31003200330020003100') == u'123 1'
+    True
     >>> decodeDbmsHexValue('313233203') == u'123 ?'
     True
     >>> decodeDbmsHexValue(['0x31', '0x32']) == [u'1', u'2']
@@ -4977,6 +4987,9 @@ def decodeDbmsHexValue(value, raw=False):
 
                 if not isinstance(retVal, six.text_type):
                     retVal = getUnicode(retVal, conf.encoding or UNICODE_ENCODING)
+
+                if u"\x00" in retVal:
+                    retVal = retVal.replace(u"\x00", u"")
 
         return retVal
 
@@ -5327,6 +5340,7 @@ def parseRequestFile(reqFile, checkParams=True):
                     continue
 
             getPostReq = False
+            forceBody = False
             url = None
             host = None
             method = None
@@ -5347,7 +5361,7 @@ def parseRequestFile(reqFile, checkParams=True):
                 line = line.strip('\r')
                 match = re.search(r"\A([A-Z]+) (.+) HTTP/[\d.]+\Z", line) if not method else None
 
-                if len(line.strip()) == 0 and method and method != HTTPMETHOD.GET and data is None:
+                if len(line.strip()) == 0 and method and (method != HTTPMETHOD.GET or forceBody) and data is None:
                     data = ""
                     params = True
 
@@ -5384,17 +5398,18 @@ def parseRequestFile(reqFile, checkParams=True):
                     elif key.upper() == HTTP_HEADER.HOST.upper():
                         if '://' in value:
                             scheme, value = value.split('://')[:2]
-                        splitValue = value.split(":")
-                        host = splitValue[0]
 
-                        if len(splitValue) > 1:
-                            port = filterStringValue(splitValue[1], "[0-9]")
+                        port = extractRegexResult(r":(?P<result>\d+)\Z", value)
+                        if port:
+                            value = value[:-(1 + len(port))]
+
+                        host = value
 
                     # Avoid to add a static content length header to
                     # headers and consider the following lines as
                     # POSTed data
                     if key.upper() == HTTP_HEADER.CONTENT_LENGTH.upper():
-                        data = ""
+                        forceBody = True
                         params = True
 
                     # Avoid proxy and connection type related headers
