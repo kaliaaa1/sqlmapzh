@@ -348,7 +348,7 @@ def error404(error=None):
     security_headers(False)
     return "Nothing here"
 
-@return_error(405)  # Method Not Allowed (e.g. when requesting a POST method via GET)
+@return_error(405)  # Method Not Allowed (列如 when requesting a POST method via GET)
 def error405(error=None):
     security_headers(False)
     return "Method not allowed"
@@ -894,20 +894,20 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             return
 
         elif command in ("help", "?"):
-            msg = "help           Show this help message\n"
-            msg += "new ARGS       Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
-            msg += "use TASKID     Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
-            msg += "data           Retrieve and show data for current task\n"
-            msg += "log            Retrieve and show log for current task\n"
-            msg += "status         Retrieve and show status for current task\n"
-            msg += "option OPTION  Retrieve and show option for current task\n"
-            msg += "options        Retrieve and show all options for current task\n"
-            msg += "stop           Stop current task\n"
-            msg += "kill           Kill current task\n"
-            msg += "list           Display all tasks\n"
-            msg += "version        Fetch server version\n"
-            msg += "flush          Flush tasks (delete all tasks)\n"
-            msg += "exit           Exit this client\n"
+            msg = "help           显示此帮助消息\n"
+            msg += "new ARGS       使用提供的参数启动新的扫描任务 (列如 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
+            msg += "use TASKID     将当前上下文切换到不同的任务 (列如 'use c04d8c5c7582efb4')\n"
+            msg += "data           检索并显示当前任务的数据\n"
+            msg += "log            检索并显示当前任务的日志\n"
+            msg += "status         检索并显示当前任务的状态\n"
+            msg += "option OPTION  检索并显示当前任务的选项\n"
+            msg += "options        检索并显示当前任务的所有选项\n"
+            msg += "stop           停止当前任务\n"
+            msg += "kill           终止当前任务\n"
+            msg += "list           显示所有任务\n"
+            msg += "version        获取服务器版本\n"
+            msg += "flush          刷新任务（删除所有任务）\n"
+            msg += "exit           退出该客户端\n"
 
             dataToStdout(msg)
 
