@@ -45,7 +45,7 @@ class Enumeration(GenericEnumeration):
         if len(kb.data.cachedDbs) > 0:
             return kb.data.cachedDbs
 
-        infoMsg = "获取数据库名称"
+        infoMsg = "fetching database names"
         logger.info(infoMsg)
 
         rootQuery = queries[DBMS.MAXDB].dbs
